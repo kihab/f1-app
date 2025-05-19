@@ -1,0 +1,40 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Driver {
+  id         Int      @id @default(autoincrement())
+  driverRef  String   @unique
+  name       String
+
+  seasonsWon Season[] @relation("SeasonChampion")
+  racesWon   Race[]   @relation("RaceWinner")
+}
+
+model Season {
+  year               Int    @id
+  championDriverId   Int
+  champion           Driver @relation("SeasonChampion", fields: [championDriverId], references: [id])
+  races              Race[]
+
+  @@unique([year, championDriverId])
+}
+
+model Race {
+  id               Int    @id @default(autoincrement())
+  seasonYear       Int
+  name             String
+  round            Int
+  winnerDriverId   Int
+  winner           Driver @relation("RaceWinner", fields: [winnerDriverId], references: [id])
+  season           Season @relation(fields: [seasonYear], references: [year])
+
+  @@unique([seasonYear, round])
+}
