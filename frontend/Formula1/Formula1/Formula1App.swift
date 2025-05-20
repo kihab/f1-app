@@ -9,11 +9,17 @@ import SwiftUI
 
 @main
 struct Formula1App: App {
+    // Create a single instance of the APIClient to be shared.
+    private let apiClient = APIClient()
+    
     var body: some Scene {
         WindowGroup {
-            // Instantiate the APIClient and inject it into the SeasonsViewModel,
-            // then pass the ViewModel to SeasonsListView.
-            SeasonsListView(viewModel: SeasonsViewModel(apiClient: APIClient()))
+            // Pass the SeasonsViewModel (initialized with apiClient)
+            // AND pass the apiClient again for SeasonsListView to use for navigation.
+            SeasonsListView(
+                viewModel: SeasonsViewModel(apiClient: apiClient), 
+                apiClient: apiClient
+            )
         }
     }
 }

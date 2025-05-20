@@ -12,7 +12,9 @@ class SeasonsViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     
-    private let apiClient: APIClientProtocol
+    // Made internal to be accessible by SeasonsListView for passing to RacesViewModel
+    // A better DI or coordinator pattern would be ideal for larger apps.
+    internal let apiClient: APIClientProtocol 
     
     /// Initializes the ViewModel with a dependency on an API client.
     /// - Parameter apiClient: An object conforming to `APIClientProtocol` for fetching data.

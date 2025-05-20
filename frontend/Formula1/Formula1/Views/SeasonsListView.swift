@@ -8,47 +8,58 @@ struct SeasonsListView: View {
     // @StateObject ensures the ViewModel's lifecycle is tied to the view's.
     @StateObject var viewModel: SeasonsViewModel
     
+    // Store the APIClient to pass it to the next view.
+    // This is injected from Formula1App.swift
+    // Note: For this to be properly injected by @StateObject in the parent,
+    // the viewModel itself should be the one holding the apiClient if it was complex.
+    // However, since viewModel is already @StateObject, and apiClient is a dependency of it,
+    // and also needed by the child view's viewModel, we pass it explicitly here for clarity
+    // in constructing the RacesViewModel.
+    // A more advanced DI setup might use an EnvironmentObject for the APIClient if shared widely.
+    private let apiClient: APIClientProtocol // Assuming viewModel was initialized with this
+
+    // Initializer to accept the ViewModel
+    // We need to ensure the apiClient is accessible for navigation
+    init(viewModel: SeasonsViewModel, apiClient: APIClientProtocol) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+        self.apiClient = apiClient
+    }
+    
     var body: some View {
-        NavigationView { // Using NavigationView as per the original ContentView
-            VStack(spacing: 0) { // Use spacing 0 if specific padding is applied elsewhere
-                // Display error message if present
+        NavigationView { 
+            VStack(spacing: 0) { 
                 if let error = viewModel.errorMessage {
                     Text(error)
                         .foregroundColor(.red)
                         .padding()
-                        .frame(maxWidth: .infinity) // Ensure it takes full width
+                        .frame(maxWidth: .infinity) 
                         .background(Color.red.opacity(0.1))
                         .cornerRadius(8)
                         .padding(.horizontal)
-                        .padding(.top) // Add some top padding if it's the first element
+                        .padding(.top) 
                 }
                 
-                // Content based on loading state
                 if viewModel.isLoading {
                     ProgressView("Loading Seasons...")
                         .padding()
-                        .frame(maxHeight: .infinity) // Center loading view if it's alone
+                        .frame(maxHeight: .infinity) 
                 } else if viewModel.seasons.isEmpty && viewModel.errorMessage == nil {
                     Text("No seasons data available. Try refreshing.")
                         .foregroundColor(.secondary)
                         .padding()
-                        .frame(maxHeight: .infinity) // Center empty state text
+                        .frame(maxHeight: .infinity) 
                 } else if !viewModel.seasons.isEmpty {
-                    // Seasons list
                     List(viewModel.seasons) { season in
-                        SeasonRowView(season: season)
+                        // NavigationLink to RacesListView
+                        NavigationLink(destination: RacesListView(viewModel: RacesViewModel(year: season.year, apiClient: self.apiClient))) {
+                            SeasonRowView(season: season)
+                        }
                     }
-                    .listStyle(.plain) // Optional: set a list style
+                    .listStyle(.plain) 
                 }
-                // Spacer to push content up if error and list are both hidden, but not ideal.
-                // Better to ensure one state (loading, error, empty, content) is always prominent.
             }
             .navigationTitle("Formula 1 Seasons")
             .onAppear {
-                // Load seasons when the view appears, if not already loaded
-                // or if you want to refresh every time it appears.
-                // Consider if (viewModel.seasons.isEmpty) { viewModel.loadSeasons() }
-                // if you don't want to reload every time.
                 Task {
                     await viewModel.loadSeasons()
                 }
@@ -57,48 +68,10 @@ struct SeasonsListView: View {
     }
 }
 
-//// Preview for SeasonsListView (optional, but good for development)
-//#if DEBUG
-//// Mock APIClient for previews
-//class MockAPIClient: APIClientProtocol {
-//    let mockSeasons = [
-//        Season(year: 2023, champion: Driver(id: 1, name: "Max Verstappen", driverRef: "verstappen")),
-//        Season(year: 2022, champion: Driver(id: 1, name: "Max Verstappen", driverRef: "verstappen")),
-//        Season(year: 2021, champion: Driver(id: 33, name: "Lewis Hamilton", driverRef: "hamilton"))
-//    ]
-//    var shouldReturnError = false
-//    
-//    func fetchSeasons() async throws -> [Season] {
-//        try await Task.sleep(nanoseconds: 1_000_000_000) // Simulate network delay
-//        if shouldReturnError {
-//            throw NetworkError.httpError(statusCode: 500)
-//        }
-//        return mockSeasons
-//    }
-//}
-//
-//struct SeasonsListView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        // Preview with data
-//        SeasonsListView(viewModel: SeasonsViewModel(apiClient: MockAPIClient()))
-//        
-//        // Preview with loading state (requires a way to set isLoading on ViewModel or a specific mock)
-//        // let loadingViewModel = SeasonsViewModel(apiClient: MockAPIClient())
-//        // loadingViewModel.isLoading = true // This needs to be done carefully for previews
-//        // SeasonsListView(viewModel: loadingViewModel)
-//        //    .previewDisplayName("Loading State")
-//
-//        // Preview with error state
-//        let errorViewModel = SeasonsViewModel(apiClient: MockAPIClient())
-//        (errorViewModel.apiClient as! MockAPIClient).shouldReturnError = true
-//        SeasonsListView(viewModel: errorViewModel)
-//            .previewDisplayName("Error State")
-//
-//        // Preview with empty state
-//        let emptyViewModel = SeasonsViewModel(apiClient: MockAPIClient())
-//        (emptyViewModel.apiClient as! MockAPIClient).mockSeasons = []
-//        SeasonsListView(viewModel: emptyViewModel)
-//            .previewDisplayName("Empty State")
-//    }
-//}
-//#endif
+// Adjusting the SeasonsViewModel to expose its apiClient for navigation purposes
+// This is a quick way; a more robust solution might involve a coordinator or routing pattern.
+extension SeasonsViewModel {
+    func getAPIClient() -> APIClientProtocol {
+        return self.apiClient // apiClient is private, need to make it internal or add getter
+    }
+}
