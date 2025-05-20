@@ -113,4 +113,8 @@ async function fetchSeasonResults(year, attempt = 0) {
   }
 }
 
-module.exports = { fetchSeasonResults };
+// **Export both functions in one object**
+module.exports = {
+  fetchChampionDriver,
+  fetchSeasonResults,
+};
