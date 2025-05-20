@@ -42,3 +42,16 @@ We implemented a **combined throttling + retry** strategy in our `seasonsService
 - **Intuitive for clients:** FE navigation (or a curl in a terminal) directly maps to the URL structure.  
 - **Bookmarkable/testable:** Easy to paste in a browser or share as a link.  
 - **Clean separation:** Avoids ambiguity and keeps routes organized under their parent resource.
+
+
+----------------
+## `isChampion` in Race Response
+
+**Decision:** Compute an `isChampion: boolean` field in the Race API response when serving `/api/seasons/{year}/races`.
+
+- **Why:** Keeps business logic centralized in the backend, prevents duplication, and ensures any client (iOS, web, etc.) receives ready-to-render data without needing to compare IDs.
+- **Alternatives:** 
+  1. Frontend compares `race.winner.id` to season’s champion ID (too much UI logic).  
+  2. Store a denormalized `isChampion` column in DB (risk of data inconsistency).
+- **Trade-off:** Slightly more compute in the controller, but a simpler, more robust client.
+

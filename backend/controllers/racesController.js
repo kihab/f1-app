@@ -13,11 +13,19 @@ async function getRaces(req, res) {
   try {
     const races = await getRacesBySeason(year);
     // Map to DTO
-    const dto = races.map((r) => ({
-      round: r.round,
-      name: r.name,
-      winner: { id: r.winner.id, name: r.winner.name, driverRef: r.winner.driverRef },
-    }));
+    const dto = races.map((r) => {
+      const isChamp = r.winner.id === r.season.championDriverId;
+      return {
+        round:      r.round,
+        name:       r.name,
+        isChampion: isChamp,
+        winner: {
+          id:        r.winner.id,
+          name:      r.winner.name,
+          driverRef: r.winner.driverRef
+        }
+      };
+    });
     res.json(dto);
   } catch (err) {
     console.error(err);

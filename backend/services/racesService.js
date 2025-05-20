@@ -22,7 +22,12 @@ async function getRacesBySeason(year) {
   // fast path
   let existing = await prisma.race.findMany({
     where: { seasonYear: year },
-    include: { winner: true },
+    include: {
+      winner: true,
+      season: {
+        select: { championDriverId: true }
+      },
+    },
     orderBy: { round: 'asc' },
   });
   if (existing.length) return existing;
@@ -59,7 +64,9 @@ async function getRacesBySeason(year) {
   // final query
   existing = await prisma.race.findMany({
     where: { seasonYear: year },
-    include: { winner: true },
+    include: { winner: true, 
+      season: { select: { championDriverId: true } } 
+    },
     orderBy: { round: 'asc' },
   });
   return existing;
