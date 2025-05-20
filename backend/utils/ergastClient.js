@@ -60,3 +60,57 @@ async function fetchChampionDriver(year, attempt = 0) {
 }
 
 module.exports = { fetchChampionDriver };
+
+/**
+ * fetchSeasonResults
+ * ------------------
+ * Fetches all races + winners in one request:
+ * GET {BASE}/{year}/results/1.json
+ *
+ * @param {number} year
+ * @param {number} attempt – retry count
+ * @returns{Promise<Array<{
+ *    round: number,
+ *    name: string,
+ *    date: string,
+ *    time?: string,
+ *    winner: { driverRef: string, name: string }
+ * }>>}
+ */
+
+async function fetchSeasonResults(year, attempt = 0) {
+  const url = `${BASE}/${year}/results/1.json`;
+  try {
+    const { data } = await axios.get(url, { timeout: 10_000 });
+    const races = data?.MRData?.RaceTable?.Races ?? [];
+
+    // Map each race entry into our shape
+    return races.map((r) => {
+      const winnerRec = r.Results?.[0]?.Driver;
+      return {
+        round: parseInt(r.round, 10),
+        name: r.raceName,
+        date: r.date,
+        time: r.time,
+        winner: winnerRec
+          ? {
+              driverRef: winnerRec.driverId,
+              name: `${winnerRec.givenName} ${winnerRec.familyName}`,
+            }
+          : null,
+      };
+    });
+  } catch (err) {
+    // Rate-limit back-off (HTTP 429)
+    if (err.response?.status === 429 && attempt === 0) {
+      const ra = parseInt(err.response.headers['retry-after'], 10) || 1;
+      console.warn(`429 for ${year}; retry after ${ra}s`);
+      await sleep(ra * 1000);
+      return fetchSeasonResults(year, attempt + 1);
+    }
+    // Bubble other errors
+    throw err;
+  }
+}
+
+module.exports = { fetchSeasonResults };

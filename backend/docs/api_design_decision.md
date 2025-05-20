@@ -21,7 +21,7 @@
 
 We implemented a **combined throttling + retry** strategy in our `seasonsService` and `ergastClient` modules:
 
-1. **300 ms delay** between each year’s fetch (controlled in service loop).<br>
+1. **100 ms delay** between each year’s fetch (controlled in service loop).<br>
 2. **Single retry on HTTP 429** with a 1 s back-off (controlled in the Ergast helper).
 
 #### Why This Approach?
@@ -32,3 +32,13 @@ We implemented a **combined throttling + retry** strategy in our `seasonsService
 * **Maintainability**: Code is modular (service vs. helper), fully commented, and easy to replace later with a batch or background solution.
 
 > **Future evolution**: We may revisit this to use a batch endpoint or background worker for near-instant seeding once the core MVP is validated.
+
+------------------------------------------
+### Path Parameter vs Query Parameter
+
+**Decision:** Use a **path parameter** (`/api/seasons/{year}/races`) rather than a query parameter (`/api/races?year=2025`) because:
+
+- **RESTful hierarchy:** Clearly expresses that races are a sub‐resource of a specific season.  
+- **Intuitive for clients:** FE navigation (or a curl in a terminal) directly maps to the URL structure.  
+- **Bookmarkable/testable:** Easy to paste in a browser or share as a link.  
+- **Clean separation:** Avoids ambiguity and keeps routes organized under their parent resource.
