@@ -7,7 +7,7 @@ Building a **SwiftUI** app using the **MVVM** pattern. Two screens: Seasons list
 ## 1. Folder Layout
 
 ```
-iOSApp/
+Formula1/
 ├── Models/                # Codable structs matching API JSON
 │   ├── Season.swift
 │   └── Race.swift
@@ -30,7 +30,7 @@ iOSApp/
 ├── Utilities/             # Helpers, e.g. error enums, logging
 │   └── ErrorHandler.swift
 │
-└── iOSAppApp.swift        # @main entrypoint with WindowGroup and NavigationStack
+└── Formula1App.swift        # @main entrypoint with WindowGroup and NavigationStack
 ```
 
 ---

@@ -11,7 +11,9 @@ import SwiftUI
 struct Formula1App: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // Instantiate the APIClient and inject it into the SeasonsViewModel,
+            // then pass the ViewModel to SeasonsListView.
+            SeasonsListView(viewModel: SeasonsViewModel(apiClient: APIClient()))
         }
     }
 }
