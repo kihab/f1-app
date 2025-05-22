@@ -17,6 +17,12 @@ const BASE = 'https://api.jolpi.ca/ergast/f1';
 // Simple sleep helper for back-off
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * fetchChampionDriver
+ * -------------------
+ * Fetches the champion driver for a given season.
+ * Retries up to 3 times on HTTP 429, using exponential backoff.
+ */
 async function fetchChampionDriver(year, attempt = 0) {
   const url = `${BASE}/${year}/driverStandings/1.json`;
 
@@ -40,44 +46,37 @@ async function fetchChampionDriver(year, attempt = 0) {
       name: `${driver.givenName} ${driver.familyName}`,
     };
   } catch (err) {
-    if (err.response?.status === 429 && attempt === 0) {
+    // Retry up to 3 times for HTTP 429
+    if (err.response?.status === 429 && attempt < 3) {
+      console.log("********* 429 RATE LIMIT HEADERS *********");
+      console.log(err.response.headers);
+      console.log("******************************************");
       // Read the Retry-After header (in seconds). Fallback to 1s if missing or unparsable.
       const ra = err.response.headers['retry-after'];
       const waitSec = ra ? parseInt(ra, 10) : 1;
+      // Exponential backoff: 1s, 2s, 4s
+      const backoff = waitSec * Math.pow(2, attempt);
 
       console.warn(
-        `429 for ${year}; proxy asked to retry after ${waitSec}s`
+        `429 for ${year}; retry after ${backoff}s (attempt ${attempt + 1}/3)`
       );
 
       // Sleep *that* many seconds before retry
-      await sleep(waitSec * 1000);
+      await sleep(backoff * 1000);
 
-      // Retry once
+      // Retry
       return fetchChampionDriver(year, attempt + 1);
     }
     throw err;
   }
 }
 
-module.exports = { fetchChampionDriver };
-
 /**
  * fetchSeasonResults
  * ------------------
- * Fetches all races + winners in one request:
- * GET {BASE}/{year}/results/1.json
- *
- * @param {number} year
- * @param {number} attempt – retry count
- * @returns{Promise<Array<{
- *    round: number,
- *    name: string,
- *    date: string,
- *    time?: string,
- *    winner: { driverRef: string, name: string }
- * }>>}
+ * Fetches all races + winners in one request.
+ * Retries up to 3 times on HTTP 429, using exponential backoff.
  */
-
 async function fetchSeasonResults(year, attempt = 0) {
   const url = `${BASE}/${year}/results/1.json`;
   try {
@@ -101,11 +100,20 @@ async function fetchSeasonResults(year, attempt = 0) {
       };
     });
   } catch (err) {
-    // Rate-limit back-off (HTTP 429)
-    if (err.response?.status === 429 && attempt === 0) {
+    // Retry up to 3 times for HTTP 429
+    if (err.response?.status === 429 && attempt < 3) {
+      console.log("********* 429 RATE LIMIT HEADERS *********");
+      console.log(err.response.headers);
+      console.log("******************************************");      
       const ra = parseInt(err.response.headers['retry-after'], 10) || 1;
-      console.warn(`429 for ${year}; retry after ${ra}s`);
-      await sleep(ra * 1000);
+      // Exponential backoff: 1s, 2s, 4s
+      const backoff = ra * Math.pow(2, attempt);
+
+      console.warn(
+        `429 for ${year}; retry after ${backoff}s (attempt ${attempt + 1}/3)`
+      );
+      await sleep(backoff * 1000);
+
       return fetchSeasonResults(year, attempt + 1);
     }
     // Bubble other errors

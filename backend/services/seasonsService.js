@@ -31,7 +31,7 @@ async function getAllSeasons() {
 
     const champion = await fetchChampionDriver(yr);
     if (!champion) {
-      await sleep(100); // small delay even when skipping
+      await sleep(300); // small delay even when skipping
       continue;         // move to next year
     }
 
@@ -50,7 +50,7 @@ async function getAllSeasons() {
     });
 
     // 100 ms throttle to respect proxy limits
-    await sleep(100);
+    await sleep(300);
   }
 
   // Final query – now DB is populated

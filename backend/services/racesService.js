@@ -36,7 +36,10 @@ async function getRacesBySeason(year) {
   const results = await fetchSeasonResults(year);
   for (const r of results) {
     // If no winner data → skip
-    if (!r.winner) continue;
+    if (!r.winner) {
+      await sleep(300);
+      continue;
+    }
 
     // Upsert driver
     const driver = await prisma.driver.upsert({
@@ -58,7 +61,7 @@ async function getRacesBySeason(year) {
     });
 
     // throttle to avoid proxy limits
-    await sleep(100);
+    await sleep(300);
   }
 
   // final query

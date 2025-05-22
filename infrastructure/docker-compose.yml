@@ -1,0 +1,33 @@
+#the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+#version: "3.9"  # Compose file format version
+
+services:       # List all the services (containers) we want to run
+
+  db:           # Name of the service: "db"
+    image: postgres:16-alpine   # Use the official Postgres 16 image (alpine = lightweight)
+    environment:               # Env vars passed into the container to configure Postgres
+      POSTGRES_DB: f1db          # Name of the DB to create on startup
+      POSTGRES_USER: f1user        # Username for DB access
+      POSTGRES_PASSWORD: f1usersecretpassword  # Password for DB access
+    volumes:                   # Persist database data between restarts!
+      - db-data:/var/lib/postgresql/data   # "db-data" is a named Docker volume
+    healthcheck:               # How Compose checks if Postgres is ready
+      test: ["CMD", "pg_isready", "-U", "f1user", "-d", "f1db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:        # Name of the service: "backend"
+    build: ../backend    # Path to your backend folder (from /infrastructure)
+    environment:         # Env vars for your backend Node app
+      DATABASE_URL: postgres://f1user:f1usersecretpassword@db:5432/f1db?schema=public
+      # Add other backend ENV vars here as needed (e.g., ERGAST_API_BASE)
+    depends_on:          # Wait for db to be "healthy" before starting backend
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"      # Expose backend on localhost:3000 (host:container)
+    # Optionally, add "command:" if you need a different start cmd
+
+volumes:    # List all named volumes used above
+  db-data:  # This persists Postgres data even if the container is deleted

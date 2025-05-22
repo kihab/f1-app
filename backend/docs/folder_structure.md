@@ -1,24 +1,27 @@
-# Backend Folder Structure
+# Backend Folder Structure
 
 ```text
 backend/
 ├── index.js                  # Entry point – loads app.js and starts the HTTP server
 ├── app.js                    # Express instance, core middleware, and route mounting
 ├── prisma/                   # Prisma schema + generated migrations
-│   └── schema.prisma         
+│   └── schema.prisma         
 ├── routes/                   # Thin route definitions (one file per resource)
-│   └── seasons.js            
+│   └── seasons.js            
+│   └── races.js            
 ├── controllers/              # HTTP‑layer logic – validates input & calls services
-│   └── seasonsController.js  
+│   └── seasonsController.js  
+│   └── racesController.js      
 ├── services/                 # **Business / domain** logic – fetch, upsert, cache…
-│   └── seasonsService.js     
+│   └── seasonsService.js     
+│   └── racesService.js       
 ├── models/                   # Optional: shared JS/TS types or DTO helpers
 ├── utils/                    # Reusable helpers (HTTP client, parsing, error utils)
 ├── tests/                    # Unit + integration tests (Jest / Supertest)
 └── .env                      # Runtime secrets & config (never commit to VCS)
 ```
 
-## Layering Philosophy  
+## Layering Philosophy 
 
 | Layer / Folder  | Responsibility                                                                         | Test Focus                                | Notes                             |
 | --------------- | -------------------------------------------------------------------------------------- | ----------------------------------------- | --------------------------------- |
