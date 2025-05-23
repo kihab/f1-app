@@ -27,7 +27,7 @@ Formula1/
 │   ├── APIClient.swift        # protocol definition
 │   └── DefaultAPIClient.swift # URLSession implementation
 │
-├── Utilities/             # Helpers, e.g. error enums, logging
+├── Utils/             # Helpers, e.g. error enums, logging
 │   └── ErrorHandler.swift
 │
 └── Formula1App.swift        # @main entrypoint with WindowGroup and NavigationStack

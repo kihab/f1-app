@@ -49,7 +49,7 @@ async function getAllSeasons() {
       create: { year: yr, championDriverId: driver.id },
     });
 
-    // 100 ms throttle to respect proxy limits
+    // Throttle to respect proxy limits
     await sleep(300);
   }
 
