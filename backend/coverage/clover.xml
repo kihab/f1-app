@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1747994925190" clover="3.2.0">
-  <project timestamp="1747994925191" name="All files">
+<coverage generated="1748004132090" clover="3.2.0">
+  <project timestamp="1748004132090" name="All files">
     <metrics statements="41" coveredstatements="13" conditionals="20" coveredconditionals="3" methods="5" coveredmethods="1" elements="66" coveredelements="17" complexity="0" loc="41" ncloc="41" packages="1" files="1" classes="1"/>
     <file name="ergastClient.js" path="/Users/kihab/Development/f1-app/backend/utils/ergastClient.js">
       <metrics statements="41" coveredstatements="13" conditionals="20" coveredconditionals="3" methods="5" coveredmethods="1"/>
