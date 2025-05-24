@@ -73,7 +73,18 @@ async function fetchChampionDriver(year, attempt = 0) {
       // Retry
       return fetchChampionDriver(year, attempt + 1);
     }
-    throw err;
+    
+    // Enhance error information based on type
+    if (err.code === 'ECONNABORTED') {
+      throw new Error(`Timeout fetching champion for ${year}: Request took too long`);
+    } else if (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN') {
+      throw new Error(`Network error fetching champion for ${year}: ${err.message}`);
+    } else if (err.response?.status) {
+      throw new Error(`API error fetching champion for ${year}: HTTP ${err.response.status}`);
+    }
+    
+    // For other unknown errors, include context
+    throw new Error(`Error fetching champion for ${year}: ${err.message}`);
   }
 }
 
@@ -129,8 +140,18 @@ async function fetchSeasonResults(year, attempt = 0) {
 
       return fetchSeasonResults(year, attempt + 1);
     }
-    // Bubble other errors
-    throw err;
+    
+    // Enhance error information based on type
+    if (err.code === 'ECONNABORTED') {
+      throw new Error(`Timeout fetching races for ${year}: Request took too long`);
+    } else if (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN') {
+      throw new Error(`Network error fetching races for ${year}: ${err.message}`);
+    } else if (err.response?.status) {
+      throw new Error(`API error fetching races for ${year}: HTTP ${err.response.status}`);
+    }
+    
+    // For other unknown errors, include context
+    throw new Error(`Error fetching races for ${year}: ${err.message}`);
   }
 }
 
