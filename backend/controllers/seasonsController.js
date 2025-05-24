@@ -4,16 +4,20 @@ const seasonsService = require('../services/seasonsService');
 /** GET /api/seasons  */
 async function getSeasons(req, res) {
   try {
+    // Ask service for the gap-aware seasons list (2005-2025, driver:null if missing)
     const seasons = await seasonsService.getAllSeasons();
 
-    // Map to DTO: year + champion name (keeps FE decoupled from DB shape)
+    // Map to DTO: { year, champion: { id, name, driverRef } } or champion: null if missing
     const response = seasons.map(s => ({
       year: s.year,
-      champion: {
-        id: s.champion.id,
-        name: s.champion.name,
-        driverRef: s.champion.driverRef,
-      },
+      // If champion exists, format champion object; else, return null (FE will know it's missing)
+      champion: s.champion
+        ? {
+            id: s.champion.id,
+            name: s.champion.name,
+            driverRef: s.champion.driverRef,
+          }
+        : null,
     }));
 
     res.json(response);

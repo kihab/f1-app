@@ -10,9 +10,7 @@
 // ------------------------------------------------------------
 
 const axios = require('axios');
-
-// Use proxy (up-to-date data) but keep default env override for tests
-const BASE = 'https://api.jolpi.ca/ergast/f1';
+const { ERGAST_BASE_URL } = require('../config/constants');
 
 // Simple sleep helper for back-off
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -24,7 +22,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * Retries up to 3 times on HTTP 429, using exponential backoff.
  */
 async function fetchChampionDriver(year, attempt = 0) {
-  const url = `${BASE}/${year}/driverStandings/1.json`;
+  const url = `${ERGAST_BASE_URL}/${year}/driverStandings/1.json`;
 
   try {
     const { data } = await axios.get(url, { timeout: 10_000 });
