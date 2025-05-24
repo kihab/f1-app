@@ -6,6 +6,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { fetchSeasonResults } = require('../utils/ergastClient');
+const { validateYear, validateDriverData, validateRaceData } = require('../utils/validationUtils');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
@@ -19,6 +20,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * 3) Re-query DB (with winner relation) → return
  */
 async function getRacesBySeason(year) {
+  // Validate year is within acceptable range
+  try {
+    validateYear(year);
+  } catch (err) {
+    throw new Error(`Invalid year: ${err.message}`);
+  }
+
   // fast path
   let existing = await prisma.race.findMany({
     where: { seasonYear: year },
@@ -40,7 +48,28 @@ async function getRacesBySeason(year) {
       await sleep(300);
       continue;
     }
+    
+    // Validate race data
+    try {
+      validateRaceData({
+        name: r.name,
+        round: r.round
+      });
+    } catch (err) {
+      console.error(`Invalid race data: ${err.message}`);
+      await sleep(300);
+      continue;
+    }
 
+    // Validate driver data before upsert
+    try {
+      validateDriverData(r.winner);
+    } catch (err) {
+      console.error(`Invalid driver data: ${err.message}`);
+      await sleep(300);
+      continue;
+    }
+    
     // Upsert driver
     const driver = await prisma.driver.upsert({
       where: { driverRef: r.winner.driverRef },

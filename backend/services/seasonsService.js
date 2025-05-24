@@ -4,6 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { fetchChampionDriver } = require('../utils/ergastClient');
 const { START_YEAR } = require('../config/constants');
+const { validateYear, validateDriverData } = require('../utils/validationUtils');
 const currentYear = new Date().getFullYear();
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -27,12 +28,29 @@ async function getAllSeasons() {
 
   // For each missing year, try to fetch and upsert (with throttle)
   for (const yr of missingYears) {
+    // Validate year before processing
+    try {
+      validateYear(yr);
+    } catch (err) {
+      console.error(`Skipping invalid year ${yr}: ${err.message}`);
+      continue;
+    }
+    
     const champion = await fetchChampionDriver(yr);
     if (!champion) {
       await sleep(300); // small delay even when skipping (throttle)
       continue;
     }
 
+    // Validate driver data before upsert
+    try {
+      validateDriverData(champion);
+    } catch (err) {
+      console.error(`Invalid driver data for ${yr}: ${err.message}`);
+      await sleep(300);
+      continue;
+    }
+    
     // Upsert driver (unique by driverRef)
     const driver = await prisma.driver.upsert({
       where: { driverRef: champion.driverRef },

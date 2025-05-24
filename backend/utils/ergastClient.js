@@ -11,6 +11,7 @@
 
 const axios = require('axios');
 const { ERGAST_BASE_URL } = require('../config/constants');
+const { validateYear } = require('./validationUtils');
 
 // Simple sleep helper for back-off
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -22,6 +23,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * Retries up to 3 times on HTTP 429, using exponential backoff.
  */
 async function fetchChampionDriver(year, attempt = 0) {
+  // Validate year before making API request
+  try {
+    validateYear(year);
+  } catch (err) {
+    throw new Error(`Invalid year parameter: ${err.message}`);
+  }
+
   const url = `${ERGAST_BASE_URL}/${year}/driverStandings/1.json`;
 
   try {
@@ -76,6 +84,13 @@ async function fetchChampionDriver(year, attempt = 0) {
  * Retries up to 3 times on HTTP 429, using exponential backoff.
  */
 async function fetchSeasonResults(year, attempt = 0) {
+  // Validate year before making API request
+  try {
+    validateYear(year);
+  } catch (err) {
+    throw new Error(`Invalid year parameter: ${err.message}`);
+  }
+
   const url = `${ERGAST_BASE_URL}/${year}/results/1.json`;
   try {
     const { data } = await axios.get(url, { timeout: 10_000 });

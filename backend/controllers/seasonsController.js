@@ -1,5 +1,6 @@
 // controllers/seasonsController.js
 const seasonsService = require('../services/seasonsService');
+const { validateYear } = require('../utils/validationUtils');
 
 /** GET /api/seasons  */
 async function getSeasons(req, res) {
