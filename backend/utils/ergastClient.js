@@ -76,7 +76,7 @@ async function fetchChampionDriver(year, attempt = 0) {
  * Retries up to 3 times on HTTP 429, using exponential backoff.
  */
 async function fetchSeasonResults(year, attempt = 0) {
-  const url = `${BASE}/${year}/results/1.json`;
+  const url = `${ERGAST_BASE_URL}/${year}/results/1.json`;
   try {
     const { data } = await axios.get(url, { timeout: 10_000 });
     const races = data?.MRData?.RaceTable?.Races ?? [];

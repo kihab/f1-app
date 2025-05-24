@@ -11,30 +11,32 @@ datasource db {
 
 model Driver {
   id         Int      @id @default(autoincrement())
-  driverRef  String   @unique
-  name       String
+  driverRef  String   @unique @db.VarChar(50)
+  name       String   @db.VarChar(100)
 
   seasonsWon Season[] @relation("SeasonChampion")
   racesWon   Race[]   @relation("RaceWinner")
 }
 
 model Season {
-  year               Int    @id
+  year               Int    @id  // 4-digit year, e.g. 2023
   championDriverId   Int
   champion           Driver @relation("SeasonChampion", fields: [championDriverId], references: [id])
-  races              Race[]
+  races              Race[] 
 
-  @@unique([year, championDriverId])
+  @@index([championDriverId])
 }
 
 model Race {
   id               Int    @id @default(autoincrement())
   seasonYear       Int
-  name             String
+  name             String @db.VarChar(100)
   round            Int
   winnerDriverId   Int
   winner           Driver @relation("RaceWinner", fields: [winnerDriverId], references: [id])
   season           Season @relation(fields: [seasonYear], references: [year])
 
   @@unique([seasonYear, round])
+  @@index([seasonYear])
+  @@index([winnerDriverId])
 }
