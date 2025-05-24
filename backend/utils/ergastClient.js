@@ -10,11 +10,60 @@
 // ------------------------------------------------------------
 
 const axios = require('axios');
-const { ERGAST_BASE_URL } = require('../config/constants');
+const { ERGAST_BASE_URL, REQUEST_TIMEOUT_MS, MAX_RETRY_ATTEMPTS } = require('../config/constants');
 const { validateYear } = require('./validationUtils');
+const { sleep, logOperationStart, formatTimingLog } = require('./commonUtils');
 
-// Simple sleep helper for back-off
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+/**
+ * Makes an API request with retry logic for rate limiting
+ * @param {string} url - The URL to request
+ * @param {number} attempt - Current attempt number (starts at 0)
+ * @param {string} operationName - Name of the operation for logging
+ * @returns {Promise<Object>} - Response data
+ */
+async function makeApiRequestWithRetry(url, attempt = 0, operationName) {
+  const startTime = Date.now();
+  
+  try {
+    const { data } = await axios.get(url, { timeout: REQUEST_TIMEOUT_MS });
+    console.log(formatTimingLog(startTime, `${operationName} API request`, { url }));
+    return data;
+  } catch (err) {
+    // Retry up to MAX_RETRY_ATTEMPTS times for HTTP 429 (rate limiting)
+    if (err.response?.status === 429 && attempt < MAX_RETRY_ATTEMPTS) {
+      console.log("********* 429 RATE LIMIT HEADERS *********");
+      console.log(err.response.headers);
+      console.log("******************************************");
+      
+      // Read the Retry-After header (in seconds) or use default
+      const ra = err.response.headers['retry-after'];
+      const waitSec = ra ? parseInt(ra, 10) : 1;
+      
+      // Exponential backoff strategy
+      const backoff = waitSec * Math.pow(2, attempt);
+
+      console.warn(
+        `429 for ${url}; retry after ${backoff}s (attempt ${attempt + 1}/${MAX_RETRY_ATTEMPTS})`
+      );
+
+      // Sleep and retry
+      await sleep(backoff * 1000);
+      return makeApiRequestWithRetry(url, attempt + 1, operationName);
+    }
+    
+    // Enhanced error handling based on error type
+    if (err.code === 'ECONNABORTED') {
+      throw new Error(`Timeout: Request to ${url} took too long`);
+    } else if (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN') {
+      throw new Error(`Network error: ${err.message}`);
+    } else if (err.response?.status) {
+      throw new Error(`API error: HTTP ${err.response.status}`);
+    }
+    
+    // For other unknown errors
+    throw new Error(`Error making request to ${url}: ${err.message}`);
+  }
+}
 
 /**
  * fetchChampionDriver
@@ -23,6 +72,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * Retries up to 3 times on HTTP 429, using exponential backoff.
  */
 async function fetchChampionDriver(year, attempt = 0) {
+  // Log operation start
+  logOperationStart('fetchChampionDriver', { year });
+  
   // Validate year before making API request
   try {
     validateYear(year);
@@ -31,14 +83,13 @@ async function fetchChampionDriver(year, attempt = 0) {
   }
 
   const url = `${ERGAST_BASE_URL}/${year}/driverStandings/1.json`;
-
+  
   try {
-    const { data } = await axios.get(url, { timeout: 10_000 });
-
+    // Use the common API request function with retry logic
+    const data = await makeApiRequestWithRetry(url, attempt, 'fetchChampionDriver');
+    
     // Defensive path-check
-    const driver =
-      data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings?.[0]
-        ?.Driver;
+    const driver = data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings?.[0]?.Driver;
 
     // Season not finished (or API missing) → return null, caller will skip
     if (!driver) {
@@ -52,38 +103,7 @@ async function fetchChampionDriver(year, attempt = 0) {
       name: `${driver.givenName} ${driver.familyName}`,
     };
   } catch (err) {
-    // Retry up to 3 times for HTTP 429
-    if (err.response?.status === 429 && attempt < 3) {
-      console.log("********* 429 RATE LIMIT HEADERS *********");
-      console.log(err.response.headers);
-      console.log("******************************************");
-      // Read the Retry-After header (in seconds). Fallback to 1s if missing or unparsable.
-      const ra = err.response.headers['retry-after'];
-      const waitSec = ra ? parseInt(ra, 10) : 1;
-      // Exponential backoff: 1s, 2s, 4s
-      const backoff = waitSec * Math.pow(2, attempt);
-
-      console.warn(
-        `429 for ${year}; retry after ${backoff}s (attempt ${attempt + 1}/3)`
-      );
-
-      // Sleep *that* many seconds before retry
-      await sleep(backoff * 1000);
-
-      // Retry
-      return fetchChampionDriver(year, attempt + 1);
-    }
-    
-    // Enhance error information based on type
-    if (err.code === 'ECONNABORTED') {
-      throw new Error(`Timeout fetching champion for ${year}: Request took too long`);
-    } else if (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN') {
-      throw new Error(`Network error fetching champion for ${year}: ${err.message}`);
-    } else if (err.response?.status) {
-      throw new Error(`API error fetching champion for ${year}: HTTP ${err.response.status}`);
-    }
-    
-    // For other unknown errors, include context
+    // Wrap the error with more context about the operation
     throw new Error(`Error fetching champion for ${year}: ${err.message}`);
   }
 }
@@ -95,6 +115,9 @@ async function fetchChampionDriver(year, attempt = 0) {
  * Retries up to 3 times on HTTP 429, using exponential backoff.
  */
 async function fetchSeasonResults(year, attempt = 0) {
+  // Log operation start
+  logOperationStart('fetchSeasonResults', { year });
+  
   // Validate year before making API request
   try {
     validateYear(year);
@@ -103,8 +126,10 @@ async function fetchSeasonResults(year, attempt = 0) {
   }
 
   const url = `${ERGAST_BASE_URL}/${year}/results/1.json`;
+  
   try {
-    const { data } = await axios.get(url, { timeout: 10_000 });
+    // Use the common API request function with retry logic
+    const data = await makeApiRequestWithRetry(url, attempt, 'fetchSeasonResults');
     const races = data?.MRData?.RaceTable?.Races ?? [];
 
     // Map each race entry into our shape
@@ -124,33 +149,7 @@ async function fetchSeasonResults(year, attempt = 0) {
       };
     });
   } catch (err) {
-    // Retry up to 3 times for HTTP 429
-    if (err.response?.status === 429 && attempt < 3) {
-      console.log("********* 429 RATE LIMIT HEADERS *********");
-      console.log(err.response.headers);
-      console.log("******************************************");      
-      const ra = parseInt(err.response.headers['retry-after'], 10) || 1;
-      // Exponential backoff: 1s, 2s, 4s
-      const backoff = ra * Math.pow(2, attempt);
-
-      console.warn(
-        `429 for ${year}; retry after ${backoff}s (attempt ${attempt + 1}/3)`
-      );
-      await sleep(backoff * 1000);
-
-      return fetchSeasonResults(year, attempt + 1);
-    }
-    
-    // Enhance error information based on type
-    if (err.code === 'ECONNABORTED') {
-      throw new Error(`Timeout fetching races for ${year}: Request took too long`);
-    } else if (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN') {
-      throw new Error(`Network error fetching races for ${year}: ${err.message}`);
-    } else if (err.response?.status) {
-      throw new Error(`API error fetching races for ${year}: HTTP ${err.response.status}`);
-    }
-    
-    // For other unknown errors, include context
+    // Wrap the error with more context about the operation
     throw new Error(`Error fetching races for ${year}: ${err.message}`);
   }
 }

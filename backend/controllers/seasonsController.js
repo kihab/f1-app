@@ -1,5 +1,6 @@
 // controllers/seasonsController.js
 const seasonsService = require('../services/seasonsService');
+const { sendBadRequestError, sendServerError, sendServiceUnavailableError, sendSuccessResponse } = require('../utils/responseUtils');
 
 /** GET /api/seasons  */
 async function getSeasons(req, res) {
@@ -9,10 +10,7 @@ async function getSeasons(req, res) {
     
     // Handle empty state with clear message
     if (!seasons || seasons.length === 0) {
-      return res.json({
-        data: [],
-        message: 'No season data available. Our systems may be experiencing temporary issues.'
-      });
+      return sendSuccessResponse(res, [], 'No season data available. Our systems may be experiencing temporary issues.');
     }
 
     // Map to DTO: { year, champion: { id, name, driverRef } } or champion: null if missing
@@ -28,23 +26,30 @@ async function getSeasons(req, res) {
         : null,
     }));
 
-    res.json(response);
+    return sendSuccessResponse(res, response);
   } catch (err) {
     console.error(err);
     // Determine appropriate error status code based on error type
     if (err.message && err.message.includes('Invalid year')) {
       // Year validation error
-      return res.status(400).json({ error: err.message });
+      return sendBadRequestError(res, err.message);
     } else if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
       // Network timeout errors
-      return res.status(503).json({ error: 'External API service unavailable' });
+      return sendServiceUnavailableError(res, 'External API service unavailable');
     } else if (err.response && err.response.status) {
       // External API returned an error status
-      return res.status(503).json({ error: `External service error: ${err.message}` });
+      return sendServiceUnavailableError(res, `External service error: ${err.message}`);
+    } else if (err.message && (
+        err.message.includes('fetching races') || 
+        err.message.includes('fetching champion') || 
+        err.message.includes('network failure') || 
+        err.message.includes('External API'))) {
+      // Errors from ergastClient or external service issues
+      return sendServiceUnavailableError(res, `External service error: ${err.message}`);
     }
     
     // Default to 500 for unknown server errors
-    res.status(500).json({ error: 'Failed to fetch seasons' });
+    return sendServerError(res, 'Failed to fetch seasons');
   }
 }
 

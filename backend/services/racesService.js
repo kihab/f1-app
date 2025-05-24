@@ -7,7 +7,8 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { fetchSeasonResults } = require('../utils/ergastClient');
 const { validateYear, validateDriverData, validateRaceData } = require('../utils/validationUtils');
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const { sleep, logOperationStart, formatTimingLog } = require('../utils/commonUtils');
+const { THROTTLE_MS } = require('../config/constants');
 
 /**
  * getRacesBySeason
@@ -20,7 +21,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * 3) Re-query DB (with winner relation) → return
  */
 async function getRacesBySeason(year) {
-  console.log(`Starting getRacesBySeason for year ${year} at ${new Date().toISOString()}`);
+  logOperationStart('getRacesBySeason', { year });
   const startTime = Date.now();
   
   // Validate year is within acceptable range
@@ -59,7 +60,7 @@ async function getRacesBySeason(year) {
     try {
       // If no winner data → skip
       if (!r.winner) {
-        await sleep(300);
+        await sleep(THROTTLE_MS);
         continue;
       }
       
@@ -72,7 +73,7 @@ async function getRacesBySeason(year) {
       } catch (err) {
         console.error(`Invalid race data: ${err.message}`);
         processingErrors.push({ round: r.round, error: `Invalid race data: ${err.message}` });
-        await sleep(300);
+        await sleep(THROTTLE_MS);
         continue;
       }
 
@@ -82,7 +83,7 @@ async function getRacesBySeason(year) {
       } catch (err) {
         console.error(`Invalid driver data: ${err.message}`);
         processingErrors.push({ round: r.round, error: `Invalid driver data: ${err.message}` });
-        await sleep(300);
+        await sleep(THROTTLE_MS);
         continue;
       }
       
@@ -106,12 +107,12 @@ async function getRacesBySeason(year) {
       });
 
       // throttle to avoid proxy limits
-      await sleep(300);
+      await sleep(THROTTLE_MS);
     } catch (err) {
       // Catch any other errors during race processing to prevent complete failure
       console.error(`Error processing race round ${r.round}: ${err.message}`);
       processingErrors.push({ round: r.round, error: err.message });
-      await sleep(300);
+      await sleep(THROTTLE_MS);
       continue;
     }
   }
@@ -124,9 +125,8 @@ async function getRacesBySeason(year) {
     },
     orderBy: { round: 'asc' },
   });
-  const endTime = Date.now();
-  const duration = (endTime - startTime) / 1000; // Convert to seconds
-  console.log(`Completed getRacesBySeason for ${year} in ${duration.toFixed(2)}s, returning ${existing.length} races`);
+  // Log completion with timing information
+  console.log(formatTimingLog(startTime, 'getRacesBySeason', { year, races: existing.length }));
   
   return existing;
 }

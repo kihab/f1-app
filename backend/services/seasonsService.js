@@ -3,19 +3,17 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { fetchChampionDriver } = require('../utils/ergastClient');
-const { START_YEAR } = require('../config/constants');
+const { START_YEAR, CURRENT_YEAR, THROTTLE_MS } = require('../config/constants');
 const { validateYear, validateDriverData } = require('../utils/validationUtils');
-const currentYear = new Date().getFullYear();
-
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const { sleep, logOperationStart, formatTimingLog } = require('../utils/commonUtils');
 
 async function getAllSeasons() {
-  console.log(`Starting getAllSeasons operation at ${new Date().toISOString()}`);
+  logOperationStart('getAllSeasons');
   const startTime = Date.now();
   
   // Query all seasons in the range, include champions if present
   let dbSeasons = await prisma.season.findMany({
-    where: { year: { gte: START_YEAR, lte: currentYear } },
+    where: { year: { gte: START_YEAR, lte: CURRENT_YEAR } },
     include: { champion: true },
   });
 
@@ -25,7 +23,7 @@ async function getAllSeasons() {
 
   // Build gap list for missing years
   const missingYears = [];
-  for (let yr = START_YEAR; yr <= currentYear; yr++) {
+  for (let yr = START_YEAR; yr <= CURRENT_YEAR; yr++) {
     if (!seasonsByYear[yr]) missingYears.push(yr);
   }
 
@@ -46,7 +44,7 @@ async function getAllSeasons() {
     try {
       const champion = await fetchChampionDriver(yr);
       if (!champion) {
-        await sleep(300); // small delay even when skipping (throttle)
+        await sleep(THROTTLE_MS); // small delay even when skipping (throttle)
         continue;
       }
 
@@ -56,7 +54,7 @@ async function getAllSeasons() {
       } catch (err) {
         console.error(`Invalid driver data for ${yr}: ${err.message}`);
         processingErrors.push({ year: yr, error: `Invalid driver data: ${err.message}` });
-        await sleep(300);
+        await sleep(THROTTLE_MS);
         continue;
       }
       
@@ -74,12 +72,12 @@ async function getAllSeasons() {
         create: { year: yr, championDriverId: driver.id },
       });
 
-      await sleep(300); // throttle to respect proxy limits
+      await sleep(THROTTLE_MS); // throttle to respect proxy limits
     } catch (err) {
       // Catch errors during fetching/upserting to prevent entire process from failing
       console.error(`Error processing year ${yr}: ${err.message}`);
       processingErrors.push({ year: yr, error: err.message });
-      await sleep(300); // still throttle on errors
+      await sleep(THROTTLE_MS); // still throttle on errors
       continue;
     }
   }
@@ -92,7 +90,7 @@ async function getAllSeasons() {
 
   // Query all again to get updated set
   dbSeasons = await prisma.season.findMany({
-    where: { year: { gte: START_YEAR, lte: currentYear } },
+    where: { year: { gte: START_YEAR, lte: CURRENT_YEAR } },
     include: { champion: true },
   });
 
@@ -102,16 +100,15 @@ async function getAllSeasons() {
 
   // Build the final response list: {year, champion: obj|null} for each year 2005-2025
   const result = [];
-  for (let yr = START_YEAR; yr <= currentYear; yr++) {
+  for (let yr = START_YEAR; yr <= CURRENT_YEAR; yr++) {
     const s = byYear[yr];
     result.push({
       year: yr,
       champion: s && s.champion ? s.champion : null, // champion is null if not present
     });
   }
-  const endTime = Date.now();
-  const duration = (endTime - startTime) / 1000; // Convert to seconds
-  console.log(`Completed getAllSeasons in ${duration.toFixed(2)}s, returning ${result.length} seasons`);
+  // Log completion with timing information
+  console.log(formatTimingLog(startTime, 'getAllSeasons', { seasons: result.length }));
   
   return result;
 }
