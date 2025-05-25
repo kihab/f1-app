@@ -4,9 +4,18 @@
 // ------------------------------------------------------------
 
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
 const { sleep } = require('../utils/commonUtils');
 const { THROTTLE_MS } = require('../config/constants');
+
+/**
+ * Creates a database service with the provided dependencies
+ * @param {Object} dependencies - Service dependencies
+ * @param {PrismaClient} dependencies.prisma - Prisma client instance
+ * @returns {Object} - Database service object with data operations
+ */
+function createDbService(dependencies = {}) {
+  // Use provided prisma client or create a new one if not provided
+  const prisma = dependencies.prisma || new PrismaClient();
 
 /**
  * Upserts a driver record in the database
@@ -120,12 +129,23 @@ async function processBatch(items, processFn, itemName = 'item') {
   };
 }
 
+  // Return the service object with all methods
+  return {
+    upsertDriver,
+    upsertSeason,
+    upsertRace,
+    findSeasons,
+    findRacesBySeason,
+    processBatch,
+    prisma, // Providing access to the underlying client if needed
+  };
+}
+
+// Create and export the default instance for regular usage
+const defaultDbService = createDbService();
+
+// Export both the factory function and the default instance
 module.exports = {
-  upsertDriver,
-  upsertSeason,
-  upsertRace,
-  findSeasons,
-  findRacesBySeason,
-  processBatch,
-  prisma, // Exporting for special cases where direct access is needed
+  createDbService,  // For tests to create with custom dependencies
+  ...defaultDbService // Export all methods directly for easy access
 };

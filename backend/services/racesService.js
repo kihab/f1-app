@@ -3,31 +3,48 @@
 //  Business-logic layer: Races
 // ------------------------------------------------------------
 
-const { fetchSeasonResults } = require('../utils/ergastClient');
-const { validateYear, validateDriverData, validateRaceData } = require('../utils/validationUtils');
-const { logOperationStart, formatTimingLog } = require('../utils/commonUtils');
-const dbService = require('./dbService');
+// Import default implementations, but these can be overridden with DI
+const ergastClientDefault = require('../utils/ergastClient');
+const validationUtilsDefault = require('../utils/validationUtils');
+const commonUtilsDefault = require('../utils/commonUtils');
+const dbServiceDefault = require('./dbService');
 
 /**
- * getRacesBySeason
- * ----------------
- * 1) Fast-path: if DB has races for this year → return
- * 2) Otherwise:
- *    a) fetch all races+winner via Ergast helper
- *    b) upsert driver + race for each entry
- *    c) 100 ms throttle between upserts
- * 3) Re-query DB (with winner relation) → return
+ * Factory function to create races service with injectable dependencies
+ * @param {Object} deps - Dependencies for the races service
+ * @param {Object} deps.dbService - Database service implementation
+ * @param {Object} deps.ergastClient - Ergast API client implementation
+ * @param {Object} deps.validationUtils - Validation utilities
+ * @param {Object} deps.commonUtils - Common utility functions
+ * @returns {Object} - Service object with races-related methods
  */
-async function getRacesBySeason(year) {
-  logOperationStart('getRacesBySeason', { year });
-  const startTime = Date.now();
+function createRacesService(deps = {}) {
+  // Use provided dependencies or defaults
+  const dbService = deps.dbService || dbServiceDefault;
+  const ergastClient = deps.ergastClient || ergastClientDefault;
+  const validationUtils = deps.validationUtils || validationUtilsDefault;
+  const commonUtils = deps.commonUtils || commonUtilsDefault;
   
-  // Validate year is within acceptable range
-  try {
-    validateYear(year);
-  } catch (err) {
-    throw new Error(`Invalid year: ${err.message}`);
-  }
+  // Destructure needed methods from dependencies
+  const { fetchSeasonResults } = ergastClient;
+  const { validateYear, validateDriverData, validateRaceData } = validationUtils;
+  const { logOperationStart, formatTimingLog } = commonUtils;
+
+  /**
+   * Get all races for a specific season with winners
+   * @param {number} year - Season year to retrieve races for
+   * @returns {Promise<Array>} - Array of race records with relations
+   */
+  async function getRacesBySeason(year) {
+    logOperationStart('getRacesBySeason', { year });
+    const startTime = Date.now();
+    
+    // Validate year is within acceptable range
+    try {
+      validateYear(year);
+    } catch (err) {
+      throw new Error(`Invalid year: ${err.message}`);
+    }
 
   // Fast path - check if races already exist in DB
   let existing = await dbService.findRacesBySeason(year);
@@ -92,4 +109,17 @@ async function getRacesBySeason(year) {
   return existing;
 }
 
-module.exports = { getRacesBySeason };
+  // Return the service object with all methods
+  return {
+    getRacesBySeason
+  };
+}
+
+// Create and export default instance for regular use
+const defaultRacesService = createRacesService();
+
+// Export both the factory function and default instance
+module.exports = {
+  createRacesService, // For tests to create with mocked dependencies
+  ...defaultRacesService // Export methods directly for easy access
+};

@@ -3,15 +3,44 @@
 //  Business-logic layer: Seasons with gap-aware self-healing
 // ------------------------------------------------------------
 
-const { fetchChampionDriver } = require('../utils/ergastClient');
-const { START_YEAR, CURRENT_YEAR } = require('../config/constants');
-const { validateYear, validateDriverData } = require('../utils/validationUtils');
-const { logOperationStart, formatTimingLog } = require('../utils/commonUtils');
-const dbService = require('./dbService');
+// Import default implementations, but these can be overridden with DI
+const ergastClientDefault = require('../utils/ergastClient');
+const constantsDefault = require('../config/constants');
+const validationUtilsDefault = require('../utils/validationUtils');
+const commonUtilsDefault = require('../utils/commonUtils');
+const dbServiceDefault = require('./dbService');
 
-async function getAllSeasons() {
-  logOperationStart('getAllSeasons');
-  const startTime = Date.now();
+/**
+ * Factory function to create seasons service with injectable dependencies
+ * @param {Object} deps - Dependencies for the seasons service
+ * @param {Object} deps.dbService - Database service implementation
+ * @param {Object} deps.ergastClient - Ergast API client implementation
+ * @param {Object} deps.constants - Constants configuration
+ * @param {Object} deps.validationUtils - Validation utilities
+ * @param {Object} deps.commonUtils - Common utility functions
+ * @returns {Object} - Service object with seasons-related methods
+ */
+function createSeasonsService(deps = {}) {
+  // Use provided dependencies or defaults
+  const dbService = deps.dbService || dbServiceDefault;
+  const ergastClient = deps.ergastClient || ergastClientDefault;
+  const constants = deps.constants || constantsDefault;
+  const validationUtils = deps.validationUtils || validationUtilsDefault;
+  const commonUtils = deps.commonUtils || commonUtilsDefault;
+  
+  // Destructure needed methods and constants from dependencies
+  const { fetchChampionDriver } = ergastClient;
+  const { START_YEAR, CURRENT_YEAR } = constants;
+  const { validateYear, validateDriverData } = validationUtils;
+  const { logOperationStart, formatTimingLog } = commonUtils;
+
+  /**
+   * Get all Formula 1 seasons with champions
+   * @returns {Promise<Array>} - Array of season records with relations
+   */
+  async function getAllSeasons() {
+    logOperationStart('getAllSeasons');
+    const startTime = Date.now();
   
   // Query all seasons in the range, include champions if present
   let dbSeasons = await dbService.findSeasons(START_YEAR, CURRENT_YEAR);
@@ -87,4 +116,17 @@ async function getAllSeasons() {
   return result;
 }
 
-module.exports = { getAllSeasons };
+  // Return the service object with all methods
+  return {
+    getAllSeasons
+  };
+}
+
+// Create and export default instance for regular use
+const defaultSeasonsService = createSeasonsService();
+
+// Export both the factory function and default instance
+module.exports = {
+  createSeasonsService, // For tests to create with mocked dependencies
+  ...defaultSeasonsService // Export methods directly for easy access
+};
