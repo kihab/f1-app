@@ -1,9 +1,6 @@
 // Import the racesService module
 const { createRacesService } = require('../../services/racesService');
 
-// Import the dbService module
-const mockDbService = require('../../services/dbService');
-
 // Mock dependencies
 jest.mock('../../services/dbService', () => ({
   processBatch: jest.fn()
