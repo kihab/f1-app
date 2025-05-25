@@ -41,6 +41,35 @@ This document details the CI/CD strategy and pipeline decisions for the **F1 Wor
 
 ---
 
+## Pipeline Stages Flow
+
+The following diagram illustrates the CI/CD pipeline flow as implemented in `.github/workflows/backend.yml`:
+
+```
+┌────────────┐     ┌───────────────┐     ┌─────────────────┐
+│  Checkout  │────▶│  Set up Node  │────▶│  Install Deps   │
+│    Code    │     │    (v20)      │     │   (npm ci)      │
+└────────────┘     └───────────────┘     └────────┬────────┘
+                                                   │
+                                                   ▼
+┌────────────┐     ┌───────────────┐     ┌─────────────────┐
+│   Build    │◀────│  Run Tests   │◀────│  Audit & Lint   │
+│Docker Image│     │  (npm test)  │     │     Code        │
+└────────────┘     └───────────────┘     └─────────────────┘
+        │
+        │          ┌ - - - - - - - - - - - - - - - - - - - ┐
+        └ - - - - ▶│       Future Steps (Optional)        │
+                   │                                       │
+                   │  • Push Image to Registry            │
+                   │  • Deploy to Cloud                   │
+                   │  • Security Scanning                 │
+                   └ - - - - - - - - - - - - - - - - - - - ┘
+```
+
+The pipeline automatically runs on pushes to main/master branches and on pull requests targeting these branches. Each stage must pass before proceeding to the next one, ensuring code quality at every step.
+
+---
+
 ## Linting: Local and CI/CD Setup
 
 * **Linter chosen:** ESLint (standard for Node/JavaScript/TypeScript)

@@ -1,0 +1,20 @@
+flowchart LR
+    A[Checkout Code] --> B[Set up Node.js v20]
+    B --> C["Install Dependencies\n(npm ci)"]
+    C --> D["Audit Dependencies\n(npm audit)"]
+    D --> E["Run Linter\n(eslint)"]
+    E --> F["Run Tests\n(npm test)"]
+    F --> G["Build Docker Image"]
+    G -.- H["Future Steps"]
+    
+    subgraph H[Future Steps]
+        direction TB
+        I[Push Image to Registry] --> J[Deploy to Cloud]
+        J --> K[Security Scanning]
+    end
+    
+    classDef current fill:#4CAF50,stroke:#009688,color:white,stroke-width:2px
+    classDef future fill:#9E9E9E,stroke:#616161,color:white,stroke-width:2px,stroke-dasharray: 5 5
+    
+    class A,B,C,D,E,F,G current
+    class H,I,J,K future
