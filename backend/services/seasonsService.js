@@ -9,6 +9,7 @@ const constantsDefault = require('../config/constants');
 const validationUtilsDefault = require('../utils/validationUtils');
 const commonUtilsDefault = require('../utils/commonUtils');
 const dbServiceDefault = require('./dbService');
+const cachingUtilsDefault = require('../utils/cachingUtils');
 
 /**
  * Factory function to create seasons service with injectable dependencies
@@ -18,6 +19,7 @@ const dbServiceDefault = require('./dbService');
  * @param {Object} deps.constants - Constants configuration
  * @param {Object} deps.validationUtils - Validation utilities
  * @param {Object} deps.commonUtils - Common utility functions
+ * @param {Object} deps.cachingUtils - Redis caching utilities
  * @returns {Object} - Service object with seasons-related methods
  */
 function createSeasonsService(deps = {}) {
@@ -27,12 +29,17 @@ function createSeasonsService(deps = {}) {
   const constants = deps.constants || constantsDefault;
   const validationUtils = deps.validationUtils || validationUtilsDefault;
   const commonUtils = deps.commonUtils || commonUtilsDefault;
+  const cachingUtils = deps.cachingUtils || cachingUtilsDefault;
   
   // Destructure needed methods and constants from dependencies
   const { fetchChampionDriver } = ergastClient;
-  const { START_YEAR, CURRENT_YEAR } = constants;
+  const { START_YEAR, CURRENT_YEAR, CACHE_TTL } = constants;
   const { validateYear, validateDriverData } = validationUtils;
   const { logOperationStart, formatTimingLog } = commonUtils;
+  const { getFromCache, setInCache } = cachingUtils;
+  
+  // Constants for caching
+  const SEASONS_CACHE_KEY = 'seasons';
 
   /**
    * Get all Formula 1 seasons with champions
@@ -41,9 +48,25 @@ function createSeasonsService(deps = {}) {
   async function getAllSeasons() {
     logOperationStart('getAllSeasons');
     const startTime = Date.now();
+
+    // Try to get seasons from cache first
+    const cachedSeasons = await getFromCache(SEASONS_CACHE_KEY);
+    
+    // If cache hit, return cached data and log
+    if (cachedSeasons) {
+      console.log('Served /api/seasons from Redis cache');
+      console.log(formatTimingLog(startTime, 'getAllSeasons', { 
+        source: 'cache',
+        seasons: cachedSeasons.length
+      }));
+      return cachedSeasons;
+    }
+    
+    // Log cache miss
+    console.log('Cache for /api/seasons expired or missing, refreshing from database');
   
-  // Query all seasons in the range, include champions if present
-  let dbSeasons = await dbService.findSeasons(START_YEAR, CURRENT_YEAR);
+    // Query all seasons in the range, include champions if present
+    let dbSeasons = await dbService.findSeasons(START_YEAR, CURRENT_YEAR);
 
   // Make a fast lookup for present years
   const seasonsByYear = {};
@@ -106,12 +129,24 @@ function createSeasonsService(deps = {}) {
     });
   }
   
+  // Store the result in Redis cache
+  const cacheSuccess = await setInCache(SEASONS_CACHE_KEY, result, CACHE_TTL.SEASONS);
+  
+  // Log cache update status
+  if (cacheSuccess) {
+    console.log('Updated Redis cache for /api/seasons');
+  }
+  
   // Log completion with timing information
   console.log(formatTimingLog(startTime, 'getAllSeasons', { 
     seasons: result.length, 
     processed: processResult.processedCount,
-    errors: processResult.errors.length 
+    errors: processResult.errors.length,
+    source: 'database',
+    cached: cacheSuccess
   }));
+  
+  console.log('Served /api/seasons from database (cache refreshed)');
   
   return result;
 }

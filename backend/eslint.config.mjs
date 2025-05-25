@@ -29,6 +29,7 @@ export default defineConfig([
       ".env",               // Add .env
       ".gitignore",         // Add .gitignore
       "Dockerfile",         // Add Dockerfile
+      ".DS_Store",          // Ignore macOS system files
       // Add other specific files or patterns if needed
     ],
   },

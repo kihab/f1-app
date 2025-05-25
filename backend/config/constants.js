@@ -24,6 +24,13 @@ const MAX_RETRY_ATTEMPTS = 3;
 // Sleep/throttle durations
 const THROTTLE_MS = 300; // Standard throttle for API calls
 
+// Cache TTL values (in seconds)
+const CACHE_TTL = {
+    SEASONS: 300, // 5 minutes for seasons data
+    RACES: 300,  // 5 minutes for races data
+    // Add other cache TTLs as needed
+};
+
 module.exports = {
     // API constants
     ERGAST_BASE_URL,
@@ -40,5 +47,8 @@ module.exports = {
     MAX_RETRY_ATTEMPTS,
     
     // Throttling
-    THROTTLE_MS
+    THROTTLE_MS,
+    
+    // Cache TTL
+    CACHE_TTL
 };

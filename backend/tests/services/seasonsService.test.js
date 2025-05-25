@@ -20,13 +20,22 @@ jest.mock('../../utils/commonUtils', () => ({
 jest.mock('../../config/constants', () => ({
   START_YEAR: 2005,
   CURRENT_YEAR: 2025,
-  THROTTLE_MS: 100
+  THROTTLE_MS: 100,
+  CACHE_TTL: {
+    SEASONS: 300
+  }
+}));
+
+jest.mock('../../utils/cachingUtils', () => ({
+  getFromCache: jest.fn(),
+  setInCache: jest.fn().mockResolvedValue(true)
 }));
 
 // Import the mocked dependencies to control their behavior
 const { fetchChampionDriver } = require('../../utils/ergastClient');
 const { validateYear, validateDriverData } = require('../../utils/validationUtils');
 const { formatTimingLog, logOperationStart } = require('../../utils/commonUtils');
+const { getFromCache, setInCache } = require('../../utils/cachingUtils');
 
 describe('seasonsService', () => {
   let mockDbService;
@@ -43,6 +52,10 @@ describe('seasonsService', () => {
       upsertSeason: jest.fn(),
       processBatch: jest.fn(),
     };
+    
+    // Setup cache to miss by default (return null)
+    getFromCache.mockResolvedValue(null);
+    setInCache.mockResolvedValue(true);
     
     // Create seasonsService with mock dependencies
     seasonsService = createSeasonsService({
@@ -80,6 +93,30 @@ describe('seasonsService', () => {
   });
 
   describe('getAllSeasons', () => {
+    test('should return data from cache when available', async () => {
+      // Setup mock cached data
+      const cachedSeasons = [
+        { year: 2005, champion: { name: 'Driver 1' } },
+        { year: 2006, champion: { name: 'Driver 2' } },
+        // Additional years would be here in real data
+      ];
+      
+      // Configure getFromCache to return data
+      getFromCache.mockResolvedValue(cachedSeasons);
+      
+      // Call the service
+      const result = await seasonsService.getAllSeasons();
+      
+      // Should have checked cache
+      expect(getFromCache).toHaveBeenCalledWith('seasons');
+      
+      // Should NOT query the database
+      expect(mockDbService.findSeasons).not.toHaveBeenCalled();
+      
+      // Should return cached data
+      expect(result).toEqual(cachedSeasons);
+    });
+    
     test('should return seasons directly if all exist in database', async () => {
       // Setup mock database with all seasons
       const mockSeasons = [
@@ -98,13 +135,19 @@ describe('seasonsService', () => {
       // Call the service
       const result = await seasonsService.getAllSeasons();
       
-      // Should query the database
+      // Should have checked cache first
+      expect(getFromCache).toHaveBeenCalledWith('seasons');
+      
+      // Should query the database after cache miss
       expect(mockDbService.findSeasons).toHaveBeenCalledWith(2005, 2025);
       
       // Should return expected format
       expect(result).toHaveLength(21); // 21 years from 2005-2025
       expect(result[0].year).toBe(2005);
       expect(result[0].champion).toBeDefined();
+      
+      // Should update the cache with the result
+      expect(setInCache).toHaveBeenCalledWith('seasons', result, 300);
     });
 
     test('should fetch missing seasons from API', async () => {

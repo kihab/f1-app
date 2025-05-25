@@ -8,6 +8,8 @@ const ergastClientDefault = require('../utils/ergastClient');
 const validationUtilsDefault = require('../utils/validationUtils');
 const commonUtilsDefault = require('../utils/commonUtils');
 const dbServiceDefault = require('./dbService');
+const cachingUtilsDefault = require('../utils/cachingUtils');
+const constantsDefault = require('../config/constants');
 
 /**
  * Factory function to create races service with injectable dependencies
@@ -16,6 +18,8 @@ const dbServiceDefault = require('./dbService');
  * @param {Object} deps.ergastClient - Ergast API client implementation
  * @param {Object} deps.validationUtils - Validation utilities
  * @param {Object} deps.commonUtils - Common utility functions
+ * @param {Object} deps.cachingUtils - Redis caching utilities
+ * @param {Object} deps.constants - Constants configuration
  * @returns {Object} - Service object with races-related methods
  */
 function createRacesService(deps = {}) {
@@ -24,11 +28,18 @@ function createRacesService(deps = {}) {
   const ergastClient = deps.ergastClient || ergastClientDefault;
   const validationUtils = deps.validationUtils || validationUtilsDefault;
   const commonUtils = deps.commonUtils || commonUtilsDefault;
+  const cachingUtils = deps.cachingUtils || cachingUtilsDefault;
+  const constants = deps.constants || constantsDefault;
   
   // Destructure needed methods from dependencies
   const { fetchSeasonResults } = ergastClient;
   const { validateYear, validateDriverData, validateRaceData } = validationUtils;
   const { logOperationStart, formatTimingLog } = commonUtils;
+  const { getFromCache, setInCache } = cachingUtils;
+  const { CACHE_TTL } = constants;
+  
+  // Cache key format for races by season
+  const getRacesCacheKey = (year) => `races:${year}`;
 
   /**
    * Get all races for a specific season with winners
@@ -45,10 +56,46 @@ function createRacesService(deps = {}) {
     } catch (err) {
       throw new Error(`Invalid year: ${err.message}`);
     }
+    
+    // Try to get races from cache first
+    const cacheKey = getRacesCacheKey(year);
+    const cachedRaces = await getFromCache(cacheKey);
+    
+    // If cache hit, return cached data and log
+    if (cachedRaces) {
+      console.log(`Served /api/races/${year} from Redis cache`);
+      console.log(formatTimingLog(startTime, 'getRacesBySeason', { 
+        year,
+        source: 'cache',
+        races: cachedRaces.length
+      }));
+      return cachedRaces;
+    }
+    
+    // Log cache miss
+    console.log(`Cache for /api/races/${year} expired or missing, refreshing from database`);
 
-  // Fast path - check if races already exist in DB
-  let existing = await dbService.findRacesBySeason(year);
-  if (existing.length) return existing;
+    // Fast path - check if races already exist in DB
+    let existing = await dbService.findRacesBySeason(year);
+    if (existing.length) {
+      // Store in cache before returning
+      const cacheSuccess = await setInCache(cacheKey, existing, CACHE_TTL.RACES);
+      
+      // Log cache update status
+      if (cacheSuccess) {
+        console.log(`Updated Redis cache for /api/races/${year}`);
+      }
+      
+      console.log(`Served /api/races/${year} from database (cache refreshed)`);
+      console.log(formatTimingLog(startTime, 'getRacesBySeason', { 
+        year,
+        source: 'database',
+        races: existing.length,
+        cached: cacheSuccess
+      }));
+      
+      return existing;
+    }
 
   // Seed path - fetch data from external API
   let results;
@@ -98,13 +145,27 @@ function createRacesService(deps = {}) {
   // Final query to get all races with relations
   existing = await dbService.findRacesBySeason(year);
   
+  // Store in cache if we have results
+  if (existing.length > 0) {
+    const cacheSuccess = await setInCache(cacheKey, existing, CACHE_TTL.RACES);
+    
+    // Log cache update status
+    if (cacheSuccess) {
+      console.log(`Updated Redis cache for /api/races/${year}`);
+    }
+  }
+  
   // Log completion with timing information
   console.log(formatTimingLog(startTime, 'getRacesBySeason', { 
     year, 
     races: existing.length,
     processed: processResult.processedCount,
-    errors: processResult.errors.length 
+    errors: processResult.errors.length,
+    source: 'API',
+    cached: existing.length > 0
   }));
+  
+  console.log(`Served /api/races/${year} from API (cache refreshed)`);
   
   return existing;
 }

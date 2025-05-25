@@ -22,10 +22,24 @@ jest.mock('../../utils/ergastClient', () => ({
   fetchSeasonResults: jest.fn()
 }));
 
+// Mock caching utils
+jest.mock('../../utils/cachingUtils', () => ({
+  getFromCache: jest.fn(),
+  setInCache: jest.fn().mockResolvedValue(true)
+}));
+
+// Mock constants
+jest.mock('../../config/constants', () => ({
+  CACHE_TTL: {
+    RACES: 120
+  }
+}));
+
 // Import the mocked dependencies to control their behavior
 const { fetchSeasonResults } = require('../../utils/ergastClient');
 const { validateYear, validateDriverData, validateRaceData } = require('../../utils/validationUtils');
 const { logOperationStart } = require('../../utils/commonUtils');
+const { getFromCache, setInCache } = require('../../utils/cachingUtils');
 
 describe('racesService', () => {
   let mockDbService;
@@ -45,6 +59,10 @@ describe('racesService', () => {
     
     // Set validateYear to succeed by default
     validateYear.mockImplementation(() => {});
+    
+    // Setup cache to miss by default (return null)
+    getFromCache.mockResolvedValue(null);
+    setInCache.mockResolvedValue(true);
     
     // Create racesService with mock dependencies
     racesService = createRacesService({
@@ -81,6 +99,29 @@ describe('racesService', () => {
   });
 
   describe('getRacesBySeason', () => {
+    test('should return data from cache when available', async () => {
+      // Setup mock cached data
+      const cachedRaces = [
+        { round: 1, name: 'Race 1', winner: { name: 'Driver 1' } },
+        { round: 2, name: 'Race 2', winner: { name: 'Driver 2' } }
+      ];
+      
+      // Configure getFromCache to return data
+      getFromCache.mockResolvedValue(cachedRaces);
+      
+      // Call the service
+      const result = await racesService.getRacesBySeason(2023);
+      
+      // Should have checked cache with correct key
+      expect(getFromCache).toHaveBeenCalledWith('races:2023');
+      
+      // Should NOT query the database
+      expect(mockDbService.findRacesBySeason).not.toHaveBeenCalled();
+      
+      // Should return cached data
+      expect(result).toEqual(cachedRaces);
+    });
+
     test('should validate the year parameter', async () => {
       // Mock database to return empty array to avoid null reference
       mockDbService.findRacesBySeason.mockResolvedValue([]);
@@ -100,6 +141,9 @@ describe('racesService', () => {
       
       // Should have validated the year
       expect(validateYear).toHaveBeenCalledWith(2023);
+      
+      // Should have checked cache first
+      expect(getFromCache).toHaveBeenCalledWith('races:2023');
     });
 
     test('should throw error if year validation fails', async () => {
@@ -136,6 +180,12 @@ describe('racesService', () => {
       
       // Should return the database results directly
       expect(result).toBe(mockRaces);
+      
+      // Should have checked cache first
+      expect(getFromCache).toHaveBeenCalledWith('races:2023');
+      
+      // Should update the cache with the result
+      expect(setInCache).toHaveBeenCalledWith('races:2023', mockRaces, 120);
     });
 
     test('should fetch races from API when not in database', async () => {
@@ -213,6 +263,12 @@ describe('racesService', () => {
       
       // Should return the updated database results
       expect(result).toBe(mockUpdatedRaces);
+      
+      // Should have checked cache first
+      expect(getFromCache).toHaveBeenCalledWith('races:2023');
+      
+      // Should update the cache with the result after API fetch
+      expect(setInCache).toHaveBeenCalledWith('races:2023', mockUpdatedRaces, 120);
     });
 
     test('should filter out races with no winner data', async () => {

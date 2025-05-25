@@ -73,6 +73,8 @@ Located at: **`infrastructure/docker-compose.yml`**
   Runs PostgreSQL 16 (alpine), using a named Docker volume for persistent data, and sets up the correct database, user, and password for the app.
 * **backend:**
   Builds from `../backend`, injects environment variables (including the Postgres connection string), depends on the DB being healthy, and exposes port 3000 for API access.
+* **redis:**
+  Runs Redis 7 (alpine) as an in-memory cache for improving API response times. The backend automatically connects to this service for caching frequently accessed data.
 
 ```yaml
 services:
@@ -94,12 +96,26 @@ services:
     build: ../backend
     environment:
       DATABASE_URL: postgres://f1user:f1usersecretpassword@db:5432/f1db?schema=public
+      REDIS_HOST: redis          # Redis service hostname (internal Docker network)
+      REDIS_PORT: 6379           # Default Redis port
       # Add other backend ENV vars here (ERGAST_API_BASE, etc.)
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - "3000:3000"
+
+  redis:  # Redis cache
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"              # Exposed for local debug/inspection
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db-data:
@@ -108,10 +124,11 @@ volumes:
 ### **Key Decisions Explained**
 
 * **Volume (`db-data`)**: Persists database data across container restarts and rebuilds.
-* **Healthcheck**: Ensures backend starts **only after** the database is ready to accept connections, eliminating race conditions.
+* **Healthcheck**: Ensures backend starts **only after** the database and Redis are ready to accept connections, eliminating race conditions.
 * **Environment Variables**: All credentials and connection info are controlled through Compose and `.env`.
 * **Automatic Migrations**: The backend runs migrations on startup, so no reviewer action is needed.
-* **No Frontend Service**: Only backend and DB are containerized (frontend is a native iOS app).
+* **Redis Cache**: Improves API performance by caching frequently accessed data with configurable TTLs.
+* **No Frontend Service**: Only backend, DB, and Redis are containerized (frontend is a native iOS app).
 
 ---
 
@@ -121,8 +138,10 @@ volumes:
 
   ```env
   DATABASE_URL="postgresql://f1user:f1usersecretpassword@db:5432/f1db?schema=public"
+  REDIS_HOST="redis"
+  REDIS_PORT="6379"
   ```
-* **Compose overrides** this in the backend container for guaranteed consistency.
+* **Compose overrides** these in the backend container for guaranteed consistency.
 
 ---
 
@@ -143,10 +162,10 @@ docker compose up --build
 
 * This command will:
 
-  1. Pull/start the Postgres container.
+  1. Pull/start the Postgres and Redis containers.
   2. Build and start the backend.
   3. Apply all DB migrations.
-  4. Seed data on first run.
+  4. Seed data on first run (and cache results in Redis).
   5. Expose API at `http://localhost:3000`
 
 **To stop and remove containers/volumes:**
@@ -161,9 +180,10 @@ docker compose down -v
 
 * **No manual migration commands** are needed—handled by backend on startup.
 * **Database persists data** (volume) until you run `down -v`.
-* **API rate limiting** is respected—code uses retry logic and proxy’s `Retry-After` header.
-* **No “localhost” DB host in backend**; Compose networks services using service names (`db`).
+* **API rate limiting** is respected—code uses retry logic and proxy's `Retry-After` header.
+* **No "localhost" DB host in backend**; Compose networks services using service names (`db` and `redis`).
 * **Seeding delay** and retries are easily tuned in code for future changes.
+* **Redis caching** is automatically configured—no manual setup required.
 
 ---
 
@@ -188,6 +208,8 @@ docker compose down -v
 
 * Could add a migration admin tool (like `pgAdmin`) as another service if needed.
 * Could add batch seeding or background jobs if API limits are tighter in future.
+* Could implement Redis persistence or cluster configuration for production environments.
+* Could add Redis monitoring/admin tools (like Redis Commander) as an additional service.
 
 ---
 

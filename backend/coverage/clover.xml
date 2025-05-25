@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1748168674522" clover="3.2.0">
-  <project timestamp="1748168674522" name="All files">
-    <metrics statements="268" coveredstatements="267" conditionals="156" coveredconditionals="150" methods="43" coveredmethods="43" elements="467" coveredelements="460" complexity="0" loc="268" ncloc="268" packages="4" files="13" classes="13"/>
+<coverage generated="1748188582960" clover="3.2.0">
+  <project timestamp="1748188582960" name="All files">
+    <metrics statements="369" coveredstatements="353" conditionals="190" coveredconditionals="174" methods="65" coveredmethods="57" elements="624" coveredelements="584" complexity="0" loc="369" ncloc="369" packages="4" files="15" classes="15"/>
     <package name="controllers">
       <metrics statements="31" coveredstatements="31" conditionals="10" coveredconditionals="10" methods="2" coveredmethods="2"/>
       <file name="racesController.js" path="/Users/kihab/Development/f1-app/backend/controllers/racesController.js">
@@ -62,7 +62,7 @@
       </file>
     </package>
     <package name="services">
-      <metrics statements="105" coveredstatements="105" conditionals="47" coveredconditionals="45" methods="18" coveredmethods="18"/>
+      <metrics statements="144" coveredstatements="144" conditionals="65" coveredconditionals="60" methods="19" coveredmethods="19"/>
       <file name="dbService.js" path="/Users/kihab/Development/f1-app/backend/services/dbService.js">
         <metrics statements="23" coveredstatements="23" conditionals="13" coveredconditionals="11" methods="7" coveredmethods="7"/>
         <line num="6" count="2" type="stmt"/>
@@ -90,96 +90,161 @@
         <line num="148" count="2" type="stmt"/>
       </file>
       <file name="racesService.js" path="/Users/kihab/Development/f1-app/backend/services/racesService.js">
-        <metrics statements="37" coveredstatements="37" conditionals="13" coveredconditionals="13" methods="5" coveredmethods="5"/>
-        <line num="7" count="1" type="stmt"/>
-        <line num="8" count="1" type="stmt"/>
-        <line num="9" count="1" type="stmt"/>
-        <line num="10" count="1" type="stmt"/>
-        <line num="23" count="14" type="cond" truecount="2" falsecount="0"/>
-        <line num="24" count="14" type="cond" truecount="2" falsecount="0"/>
-        <line num="25" count="14" type="cond" truecount="2" falsecount="0"/>
-        <line num="26" count="14" type="cond" truecount="2" falsecount="0"/>
-        <line num="29" count="14" type="stmt"/>
-        <line num="30" count="14" type="stmt"/>
-        <line num="31" count="14" type="stmt"/>
-        <line num="39" count="9" type="stmt"/>
-        <line num="40" count="9" type="stmt"/>
-        <line num="43" count="9" type="stmt"/>
-        <line num="44" count="9" type="stmt"/>
-        <line num="46" count="1" type="stmt"/>
-        <line num="50" count="8" type="stmt"/>
-        <line num="51" count="8" type="cond" truecount="2" falsecount="0"/>
-        <line num="55" count="5" type="stmt"/>
-        <line num="56" count="5" type="stmt"/>
-        <line num="59" count="1" type="stmt"/>
-        <line num="60" count="1" type="stmt"/>
-        <line num="64" count="4" type="stmt"/>
-        <line num="66" count="5" type="stmt"/>
-        <line num="70" count="3" type="stmt"/>
-        <line num="76" count="2" type="stmt"/>
-        <line num="79" count="2" type="stmt"/>
-        <line num="82" count="2" type="stmt"/>
-        <line num="93" count="4" type="cond" truecount="2" falsecount="0"/>
-        <line num="94" count="1" type="stmt"/>
-        <line num="95" count="1" type="stmt"/>
-        <line num="99" count="4" type="stmt"/>
-        <line num="102" count="4" type="stmt"/>
-        <line num="109" count="4" type="stmt"/>
-        <line num="113" count="14" type="stmt"/>
-        <line num="119" count="1" type="stmt"/>
-        <line num="122" count="1" type="stmt"/>
-      </file>
-      <file name="seasonsService.js" path="/Users/kihab/Development/f1-app/backend/services/seasonsService.js">
-        <metrics statements="45" coveredstatements="45" conditionals="21" coveredconditionals="21" methods="6" coveredmethods="6"/>
+        <metrics statements="62" coveredstatements="62" conditionals="25" coveredconditionals="23" methods="6" coveredmethods="6"/>
         <line num="7" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
         <line num="9" count="1" type="stmt"/>
         <line num="10" count="1" type="stmt"/>
         <line num="11" count="1" type="stmt"/>
-        <line num="25" count="11" type="cond" truecount="2" falsecount="0"/>
-        <line num="26" count="11" type="cond" truecount="2" falsecount="0"/>
-        <line num="27" count="11" type="cond" truecount="2" falsecount="0"/>
-        <line num="28" count="11" type="cond" truecount="2" falsecount="0"/>
-        <line num="29" count="11" type="cond" truecount="2" falsecount="0"/>
-        <line num="32" count="11" type="stmt"/>
-        <line num="33" count="11" type="stmt"/>
-        <line num="34" count="11" type="stmt"/>
-        <line num="35" count="11" type="stmt"/>
-        <line num="42" count="6" type="stmt"/>
-        <line num="43" count="6" type="stmt"/>
-        <line num="46" count="6" type="stmt"/>
-        <line num="49" count="6" type="stmt"/>
-        <line num="50" count="6" type="stmt"/>
-        <line num="53" count="6" type="stmt"/>
-        <line num="54" count="6" type="stmt"/>
-        <line num="55" count="126" type="cond" truecount="2" falsecount="0"/>
-        <line num="59" count="6" type="stmt"/>
-        <line num="64" count="60" type="stmt"/>
-        <line num="67" count="39" type="stmt"/>
-        <line num="70" count="39" type="cond" truecount="2" falsecount="0"/>
-        <line num="71" count="20" type="stmt"/>
-        <line num="75" count="19" type="stmt"/>
-        <line num="78" count="19" type="stmt"/>
-        <line num="81" count="19" type="stmt"/>
-        <line num="87" count="6" type="cond" truecount="2" falsecount="0"/>
-        <line num="88" count="2" type="stmt"/>
-        <line num="89" count="22" type="stmt"/>
-        <line num="93" count="6" type="stmt"/>
-        <line num="96" count="6" type="stmt"/>
-        <line num="97" count="6" type="stmt"/>
-        <line num="100" count="6" type="stmt"/>
-        <line num="101" count="6" type="stmt"/>
-        <line num="102" count="126" type="stmt"/>
-        <line num="103" count="126" type="stmt"/>
-        <line num="110" count="6" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="27" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="28" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="29" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="30" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="31" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="32" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="35" count="15" type="stmt"/>
+        <line num="36" count="15" type="stmt"/>
+        <line num="37" count="15" type="stmt"/>
+        <line num="38" count="15" type="stmt"/>
+        <line num="39" count="15" type="stmt"/>
+        <line num="42" count="15" type="stmt"/>
+        <line num="50" count="10" type="stmt"/>
+        <line num="51" count="10" type="stmt"/>
+        <line num="54" count="10" type="stmt"/>
+        <line num="55" count="10" type="stmt"/>
+        <line num="57" count="1" type="stmt"/>
+        <line num="61" count="9" type="stmt"/>
+        <line num="62" count="9" type="stmt"/>
+        <line num="65" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="66" count="1" type="stmt"/>
+        <line num="67" count="1" type="stmt"/>
+        <line num="72" count="1" type="stmt"/>
+        <line num="76" count="8" type="stmt"/>
+        <line num="79" count="8" type="stmt"/>
+        <line num="80" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="82" count="3" type="stmt"/>
+        <line num="85" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="86" count="3" type="stmt"/>
+        <line num="89" count="3" type="stmt"/>
+        <line num="90" count="3" type="stmt"/>
+        <line num="97" count="3" type="stmt"/>
+        <line num="102" count="5" type="stmt"/>
+        <line num="103" count="5" type="stmt"/>
+        <line num="106" count="1" type="stmt"/>
+        <line num="107" count="1" type="stmt"/>
+        <line num="111" count="4" type="stmt"/>
+        <line num="113" count="5" type="stmt"/>
+        <line num="117" count="3" type="stmt"/>
+        <line num="123" count="2" type="stmt"/>
+        <line num="126" count="2" type="stmt"/>
+        <line num="129" count="2" type="stmt"/>
+        <line num="140" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="141" count="1" type="stmt"/>
+        <line num="142" count="1" type="stmt"/>
+        <line num="146" count="4" type="stmt"/>
+        <line num="149" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="150" count="2" type="stmt"/>
+        <line num="153" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="154" count="2" type="stmt"/>
+        <line num="159" count="4" type="stmt"/>
+        <line num="168" count="4" type="stmt"/>
+        <line num="170" count="4" type="stmt"/>
+        <line num="174" count="15" type="stmt"/>
+        <line num="180" count="1" type="stmt"/>
+        <line num="183" count="1" type="stmt"/>
+      </file>
+      <file name="seasonsService.js" path="/Users/kihab/Development/f1-app/backend/services/seasonsService.js">
+        <metrics statements="59" coveredstatements="59" conditionals="27" coveredconditionals="26" methods="6" coveredmethods="6"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="27" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="28" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="29" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="30" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="31" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="32" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="35" count="12" type="stmt"/>
+        <line num="36" count="12" type="stmt"/>
+        <line num="37" count="12" type="stmt"/>
+        <line num="38" count="12" type="stmt"/>
+        <line num="39" count="12" type="stmt"/>
+        <line num="42" count="12" type="stmt"/>
+        <line num="49" count="7" type="stmt"/>
+        <line num="50" count="7" type="stmt"/>
+        <line num="53" count="7" type="stmt"/>
+        <line num="56" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="57" count="1" type="stmt"/>
+        <line num="58" count="1" type="stmt"/>
+        <line num="62" count="1" type="stmt"/>
+        <line num="66" count="6" type="stmt"/>
+        <line num="69" count="6" type="stmt"/>
+        <line num="72" count="6" type="stmt"/>
+        <line num="73" count="6" type="stmt"/>
+        <line num="76" count="6" type="stmt"/>
+        <line num="77" count="6" type="stmt"/>
+        <line num="78" count="126" type="cond" truecount="2" falsecount="0"/>
+        <line num="82" count="6" type="stmt"/>
+        <line num="87" count="60" type="stmt"/>
+        <line num="90" count="39" type="stmt"/>
+        <line num="93" count="39" type="cond" truecount="2" falsecount="0"/>
+        <line num="94" count="20" type="stmt"/>
+        <line num="98" count="19" type="stmt"/>
+        <line num="101" count="19" type="stmt"/>
+        <line num="104" count="19" type="stmt"/>
+        <line num="110" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="111" count="2" type="stmt"/>
+        <line num="112" count="22" type="stmt"/>
         <line num="116" count="6" type="stmt"/>
-        <line num="120" count="11" type="stmt"/>
-        <line num="126" count="1" type="stmt"/>
-        <line num="129" count="1" type="stmt"/>
+        <line num="119" count="6" type="stmt"/>
+        <line num="120" count="6" type="stmt"/>
+        <line num="123" count="6" type="stmt"/>
+        <line num="124" count="6" type="stmt"/>
+        <line num="125" count="126" type="stmt"/>
+        <line num="126" count="126" type="stmt"/>
+        <line num="133" count="6" type="stmt"/>
+        <line num="136" count="6" type="cond" truecount="1" falsecount="1"/>
+        <line num="137" count="6" type="stmt"/>
+        <line num="141" count="6" type="stmt"/>
+        <line num="149" count="6" type="stmt"/>
+        <line num="151" count="6" type="stmt"/>
+        <line num="155" count="12" type="stmt"/>
+        <line num="161" count="1" type="stmt"/>
+        <line num="164" count="1" type="stmt"/>
       </file>
     </package>
     <package name="utils">
-      <metrics statements="122" coveredstatements="121" conditionals="99" coveredconditionals="95" methods="23" coveredmethods="23"/>
+      <metrics statements="184" coveredstatements="168" conditionals="115" coveredconditionals="104" methods="44" coveredmethods="36"/>
+      <file name="cachingUtils.js" path="/Users/kihab/Development/f1-app/backend/utils/cachingUtils.js">
+        <metrics statements="23" coveredstatements="23" conditionals="6" coveredconditionals="6" methods="4" coveredmethods="4"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="16" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="17" count="9" type="stmt"/>
+        <line num="25" count="3" type="stmt"/>
+        <line num="26" count="3" type="stmt"/>
+        <line num="28" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="37" count="1" type="stmt"/>
+        <line num="49" count="3" type="stmt"/>
+        <line num="51" count="3" type="stmt"/>
+        <line num="52" count="2" type="stmt"/>
+        <line num="54" count="1" type="stmt"/>
+        <line num="55" count="1" type="stmt"/>
+        <line num="65" count="2" type="stmt"/>
+        <line num="66" count="2" type="stmt"/>
+        <line num="67" count="1" type="stmt"/>
+        <line num="69" count="1" type="stmt"/>
+        <line num="70" count="1" type="stmt"/>
+        <line num="74" count="9" type="stmt"/>
+        <line num="82" count="1" type="stmt"/>
+        <line num="85" count="1" type="stmt"/>
+      </file>
       <file name="commonUtils.js" path="/Users/kihab/Development/f1-app/backend/utils/commonUtils.js">
         <metrics statements="11" coveredstatements="11" conditionals="4" coveredconditionals="4" methods="6" coveredmethods="6"/>
         <line num="9" count="1" type="stmt"/>
@@ -277,6 +342,48 @@
         <line num="44" count="4" type="stmt"/>
         <line num="48" count="1" type="stmt"/>
         <line num="51" count="1" type="stmt"/>
+      </file>
+      <file name="redisClient.js" path="/Users/kihab/Development/f1-app/backend/utils/redisClient.js">
+        <metrics statements="39" coveredstatements="24" conditionals="10" coveredconditionals="3" methods="17" coveredmethods="9"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="14" count="6" type="cond" truecount="1" falsecount="1"/>
+        <line num="16" count="6" type="stmt"/>
+        <line num="20" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="21" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+        <line num="40" count="0" type="stmt"/>
+        <line num="41" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="57" count="6" type="stmt"/>
+        <line num="62" count="3" type="stmt"/>
+        <line num="64" count="3" type="stmt"/>
+        <line num="65" count="3" type="stmt"/>
+        <line num="68" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="80" count="6" type="cond" truecount="1" falsecount="1"/>
+        <line num="82" count="6" type="stmt"/>
+        <line num="83" count="6" type="stmt"/>
+        <line num="84" count="6" type="stmt"/>
+        <line num="85" count="6" type="stmt"/>
+        <line num="86" count="6" type="stmt"/>
+        <line num="89" count="6" type="stmt"/>
+        <line num="90" count="6" type="stmt"/>
+        <line num="91" count="6" type="stmt"/>
+        <line num="92" count="6" type="stmt"/>
+        <line num="93" count="6" type="stmt"/>
+        <line num="98" count="6" type="stmt"/>
+        <line num="100" count="6" type="stmt"/>
+        <line num="104" count="2" type="stmt"/>
+        <line num="106" count="2" type="stmt"/>
+        <line num="107" count="3" type="stmt"/>
       </file>
       <file name="responseUtils.js" path="/Users/kihab/Development/f1-app/backend/utils/responseUtils.js">
         <metrics statements="18" coveredstatements="18" conditionals="7" coveredconditionals="7" methods="5" coveredmethods="5"/>
