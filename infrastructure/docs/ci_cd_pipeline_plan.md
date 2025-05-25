@@ -28,6 +28,23 @@ This document details the CI/CD strategy and pipeline decisions for the **F1 Wor
 * **iOS pipeline is skipped** for now—see rationale below.
 
 ---
+## CI/CD Pipeline Design: Single Job vs. Multiple Jobs
+
+Our pipeline is currently implemented as a single GitHub Actions job with sequential steps. This approach was chosen for simplicity and speed, as all steps share the same environment and filesystem, minimizing setup time and resource usage.
+
+**Pros:**  
+- Simple and easy to follow for small/medium projects  
+- All steps share context and filesystem  
+- Lower CI resource consumption
+
+**Cons:**  
+- No parallel execution; steps always run sequentially  
+- Less modular; cannot rerun or isolate specific stages  
+- Limited workflow visualization
+
+As the project grows, I am aware that splitting the workflow into multiple jobs—with dependencies managed via `needs:`—can enable parallelism, better isolation, and improved visual tracking of the pipeline. The pipeline structure can be easily refactored if these advantages become more valuable for our team or project scale.
+
+---
 
 ## MVP Pipeline Stages (Backend Only)
 
