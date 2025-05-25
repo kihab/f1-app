@@ -75,6 +75,8 @@ Located at: **`infrastructure/docker-compose.yml`**
   Builds from `../backend`, injects environment variables (including the Postgres connection string), depends on the DB being healthy, and exposes port 3000 for API access.
 * **redis:**
   Runs Redis 7 (alpine) as an in-memory cache for improving API response times. The backend automatically connects to this service for caching frequently accessed data.
+* **pgadmin:**
+  Runs pgAdmin 4 (version 8.6), a web-based PostgreSQL administration tool that provides a graphical interface to manage the database. It's accessible via a web browser at http://localhost:8080 using the credentials admin@f1.com (email) and adminpw123 (password).
 
 ```yaml
 services:
@@ -119,16 +121,19 @@ services:
 
 volumes:
   db-data:
+  redis-data:
+  pgadmin-data:
 ```
 
 ### **Key Decisions Explained**
 
-* **Volume (`db-data`)**: Persists database data across container restarts and rebuilds.
+* **Volumes (`db-data`, `redis-data`, `pgadmin-data`)**: Persist data across container restarts and rebuilds for database, Redis, and pgAdmin settings respectively.
 * **Healthcheck**: Ensures backend starts **only after** the database and Redis are ready to accept connections, eliminating race conditions.
 * **Environment Variables**: All credentials and connection info are controlled through Compose and `.env`.
 * **Automatic Migrations**: The backend runs migrations on startup, so no reviewer action is needed.
 * **Redis Cache**: Improves API performance by caching frequently accessed data with configurable TTLs.
-* **No Frontend Service**: Only backend, DB, and Redis are containerized (frontend is a native iOS app).
+* **pgAdmin**: Provides a web-based UI for database management and inspection without requiring any local Postgres tools.
+* **No Frontend Service**: Only backend, DB, Redis, and pgAdmin are containerized (frontend is a native iOS app).
 
 ---
 
@@ -152,7 +157,7 @@ volumes:
 
 ---
 
-## **7. How to Run the Project**
+## **7. How to Run the Project and Access pgAdmin**
 
 **From the `infrastructure/` folder:**
 
@@ -162,11 +167,11 @@ docker compose up --build
 
 * This command will:
 
-  1. Pull/start the Postgres and Redis containers.
+  1. Pull/start the Postgres, Redis, and pgAdmin containers.
   2. Build and start the backend.
   3. Apply all DB migrations.
   4. Seed data on first run (and cache results in Redis).
-  5. Expose API at `http://localhost:3000`
+  5. Expose API at `http://localhost:3000` and pgAdmin at `http://localhost:8080`
 
 **To stop and remove containers/volumes:**
 
@@ -184,6 +189,7 @@ docker compose down -v
 * **No "localhost" DB host in backend**; Compose networks services using service names (`db` and `redis`).
 * **Seeding delay** and retries are easily tuned in code for future changes.
 * **Redis caching** is automatically configured—no manual setup required.
+* **pgAdmin access** is available at http://localhost:8080—login with admin@f1.com and adminpw123.
 
 ---
 
@@ -206,7 +212,7 @@ docker compose down -v
 
 ## **11. Further Improvements**
 
-* Could add a migration admin tool (like `pgAdmin`) as another service if needed.
+* ~~Could add a migration admin tool (like `pgAdmin`) as another service if needed.~~ ✅ Done
 * Could add batch seeding or background jobs if API limits are tighter in future.
 * Could implement Redis persistence or cluster configuration for production environments.
 * Could add Redis monitoring/admin tools (like Redis Commander) as an additional service.

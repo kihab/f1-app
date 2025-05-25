@@ -1,4 +1,4 @@
-# Docker Compose for F1 App Backend + DB + Redis
+# Docker Compose for F1 App Backend + DB + Redis + pgAdmin
 
 services:
   db:  # PostgreSQL database
@@ -19,8 +19,8 @@ services:
     build: ../backend
     environment:
       DATABASE_URL: postgres://f1user:f1usersecretpassword@db:5432/f1db?schema=public
-      REDIS_HOST: redis          # <--- Tell backend how to reach Redis service (internal Docker network)
-      REDIS_PORT: 6379           # <--- Default Redis port
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       # Add other backend ENV vars here as needed (e.g., ERGAST_API_BASE)
     depends_on:
       db:
@@ -33,15 +33,28 @@ services:
   redis:  # Redis cache
     image: redis:7-alpine
     ports:
-      - "6379:6379"              # Optional: expose for local debug/inspection
+      - "6379:6379"
     volumes:
-      - redis-data:/data         # Persist Redis data for dev/demo (optional, but professional)
+      - redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  pgadmin:  # PostgreSQL web admin GUI
+    image: dpage/pgadmin4:8.6
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@f1.com      # Email for pgAdmin login
+      PGADMIN_DEFAULT_PASSWORD: adminpw123       # Password for pgAdmin login
+    ports:
+      - "8080:80"                                # Visit http://localhost:8080 in your browser
+    depends_on:
+      - db
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
 volumes:
   db-data:
   redis-data:
+  pgadmin-data:
