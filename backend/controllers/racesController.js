@@ -1,9 +1,13 @@
 // controllers/racesController.js
 // ------------------------------------------------------------
+// API Controller for race-related endpoints
+// ------------------------------------------------------------
 
 const { getRacesBySeason } = require('../services/racesService');
 const { validateYear } = require('../utils/validationUtils');
-const { sendBadRequestError, sendServerError, sendServiceUnavailableError, sendSuccessResponse } = require('../utils/responseUtils');
+const { sendBadRequestError, sendSuccessResponse } = require('../utils/responseUtils');
+const { transformRacesToDto } = require('../utils/dtoUtils');
+const { handleApiError } = require('../utils/errorHandler');
 
 /** GET /api/seasons/:year/races */
 async function getRaces(req, res) {
@@ -27,44 +31,12 @@ async function getRaces(req, res) {
       return sendSuccessResponse(res, [], `No race data available for ${year}. The season may not have started or data is not yet available.`);
     }
     
-    // Map to DTO
-    const dto = races.map((r) => {
-      const isChamp = r.winner.id === r.season.championDriverId;
-      return {
-        round:      r.round,
-        name:       r.name,
-        isChampion: isChamp,
-        winner: {
-          id:        r.winner.id,
-          name:      r.winner.name,
-          driverRef: r.winner.driverRef
-        }
-      };
-    });
-    return sendSuccessResponse(res, dto);
+    // Transform race entities to DTOs using the utility function
+    const raceDtos = transformRacesToDto(races);
+    return sendSuccessResponse(res, raceDtos);
   } catch (err) {
-    console.error(err);
-    // Determine appropriate error status code based on error type
-    if (err.message && err.message.includes('Invalid year')) {
-      // Year validation error
-      return sendBadRequestError(res, err.message);
-    } else if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
-      // Network timeout errors
-      return sendServiceUnavailableError(res, 'External API service unavailable');
-    } else if (err.response && err.response.status) {
-      // External API returned an error status
-      return sendServiceUnavailableError(res, `External service error: ${err.message}`);
-    } else if (err.message && (
-        err.message.includes('fetching races') || 
-        err.message.includes('fetching champion') || 
-        err.message.includes('network failure') || 
-        err.message.includes('External API'))) {
-      // Errors from ergastClient or external service issues
-      return sendServiceUnavailableError(res, `External service error: ${err.message}`);
-    }
-    
-    // Default to 500 for unknown server errors
-    return sendServerError(res, 'Failed to fetch races');
+    // Use centralized error handler for consistent error responses
+    return handleApiError(err, res, 'fetching races');
   }
 }
 
