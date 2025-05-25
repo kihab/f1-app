@@ -1,21 +1,20 @@
-// Business logic for /api/seasons with gap-aware self-healing
+// services/seasonsService.js
+// ------------------------------------------------------------
+//  Business-logic layer: Seasons with gap-aware self-healing
+// ------------------------------------------------------------
 
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
 const { fetchChampionDriver } = require('../utils/ergastClient');
-const { START_YEAR, CURRENT_YEAR, THROTTLE_MS } = require('../config/constants');
+const { START_YEAR, CURRENT_YEAR } = require('../config/constants');
 const { validateYear, validateDriverData } = require('../utils/validationUtils');
-const { sleep, logOperationStart, formatTimingLog } = require('../utils/commonUtils');
+const { logOperationStart, formatTimingLog } = require('../utils/commonUtils');
+const dbService = require('./dbService');
 
 async function getAllSeasons() {
   logOperationStart('getAllSeasons');
   const startTime = Date.now();
   
   // Query all seasons in the range, include champions if present
-  let dbSeasons = await prisma.season.findMany({
-    where: { year: { gte: START_YEAR, lte: CURRENT_YEAR } },
-    include: { champion: true },
-  });
+  let dbSeasons = await dbService.findSeasons(START_YEAR, CURRENT_YEAR);
 
   // Make a fast lookup for present years
   const seasonsByYear = {};
@@ -26,73 +25,43 @@ async function getAllSeasons() {
   for (let yr = START_YEAR; yr <= CURRENT_YEAR; yr++) {
     if (!seasonsByYear[yr]) missingYears.push(yr);
   }
-
-  // Track errors during processing to avoid crashing the entire function
-  const processingErrors = [];
-
-  // For each missing year, try to fetch and upsert (with throttle)
-  for (const yr of missingYears) {
-    // Validate year before processing
-    try {
+  
+  // Process missing years with our batch processor
+  const processResult = await dbService.processBatch(
+    missingYears,
+    // Processing function for each year
+    async (yr) => {
+      // Validate year 
       validateYear(yr);
-    } catch (err) {
-      console.error(`Skipping invalid year ${yr}: ${err.message}`);
-      processingErrors.push({ year: yr, error: err.message });
-      continue;
-    }
-    
-    try {
+      
+      // Fetch champion data from API
       const champion = await fetchChampionDriver(yr);
+      
+      // Skip years with no champion data
       if (!champion) {
-        await sleep(THROTTLE_MS); // small delay even when skipping (throttle)
-        continue;
-      }
-
-      // Validate driver data before upsert
-      try {
-        validateDriverData(champion);
-      } catch (err) {
-        console.error(`Invalid driver data for ${yr}: ${err.message}`);
-        processingErrors.push({ year: yr, error: `Invalid driver data: ${err.message}` });
-        await sleep(THROTTLE_MS);
-        continue;
+        return; // No champion to process
       }
       
+      // Validate champion data
+      validateDriverData(champion);
+      
       // Upsert driver (unique by driverRef)
-      const driver = await prisma.driver.upsert({
-        where: { driverRef: champion.driverRef },
-        update: { name: champion.name },
-        create: { driverRef: champion.driverRef, name: champion.name },
-      });
+      const driver = await dbService.upsertDriver(champion);
 
-      // Upsert season
-      await prisma.season.upsert({
-        where: { year: yr },
-        update: { championDriverId: driver.id },
-        create: { year: yr, championDriverId: driver.id },
-      });
-
-      await sleep(THROTTLE_MS); // throttle to respect proxy limits
-    } catch (err) {
-      // Catch errors during fetching/upserting to prevent entire process from failing
-      console.error(`Error processing year ${yr}: ${err.message}`);
-      processingErrors.push({ year: yr, error: err.message });
-      await sleep(THROTTLE_MS); // still throttle on errors
-      continue;
-    }
-  }
+      // Upsert season with champion relation
+      await dbService.upsertSeason(yr, driver.id);
+    },
+    'season' // Item name for logging
+  );
 
   // Log summary of errors if any occurred during processing
-  if (processingErrors.length > 0) {
-    console.error(`Completed with ${processingErrors.length} errors:`,  
-      processingErrors.map(e => `Year ${e.year}: ${e.error}`).join(''));
+  if (processResult.errors.length > 0) {
+    console.error(`Completed with ${processResult.errors.length} errors:`,  
+      processResult.errors.map(e => `Year ${e.id}: ${e.error}`).join(', '));
   }
 
   // Query all again to get updated set
-  dbSeasons = await prisma.season.findMany({
-    where: { year: { gte: START_YEAR, lte: CURRENT_YEAR } },
-    include: { champion: true },
-  });
+  dbSeasons = await dbService.findSeasons(START_YEAR, CURRENT_YEAR);
 
   // Map seasons by year again for lookup
   const byYear = {};
@@ -107,8 +76,13 @@ async function getAllSeasons() {
       champion: s && s.champion ? s.champion : null, // champion is null if not present
     });
   }
+  
   // Log completion with timing information
-  console.log(formatTimingLog(startTime, 'getAllSeasons', { seasons: result.length }));
+  console.log(formatTimingLog(startTime, 'getAllSeasons', { 
+    seasons: result.length, 
+    processed: processResult.processedCount,
+    errors: processResult.errors.length 
+  }));
   
   return result;
 }

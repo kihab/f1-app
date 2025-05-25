@@ -3,12 +3,10 @@
 //  Business-logic layer: Races
 // ------------------------------------------------------------
 
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
 const { fetchSeasonResults } = require('../utils/ergastClient');
 const { validateYear, validateDriverData, validateRaceData } = require('../utils/validationUtils');
-const { sleep, logOperationStart, formatTimingLog } = require('../utils/commonUtils');
-const { THROTTLE_MS } = require('../config/constants');
+const { logOperationStart, formatTimingLog } = require('../utils/commonUtils');
+const dbService = require('./dbService');
 
 /**
  * getRacesBySeason
@@ -31,20 +29,11 @@ async function getRacesBySeason(year) {
     throw new Error(`Invalid year: ${err.message}`);
   }
 
-  // fast path
-  let existing = await prisma.race.findMany({
-    where: { seasonYear: year },
-    include: {
-      winner: true,
-      season: {
-        select: { championDriverId: true }
-      },
-    },
-    orderBy: { round: 'asc' },
-  });
+  // Fast path - check if races already exist in DB
+  let existing = await dbService.findRacesBySeason(year);
   if (existing.length) return existing;
 
-  // seed path
+  // Seed path - fetch data from external API
   let results;
   try {
     results = await fetchSeasonResults(year);
@@ -53,80 +42,52 @@ async function getRacesBySeason(year) {
     console.error(`Failed to fetch results for year ${year}: ${err.message}`);
     throw new Error(`Failed to fetch race data for ${year}: ${err.message}`);
   }
-  // Track processing errors
-  const processingErrors = [];
-  
-  for (const r of results) {
-    try {
-      // If no winner data → skip
-      if (!r.winner) {
-        await sleep(THROTTLE_MS);
-        continue;
-      }
-      
+
+  // Process races with our batch processor
+  const processResult = await dbService.processBatch(
+    // Filter out races without winner data
+    results.filter(r => r.winner),
+    // Processing function for each race
+    async (race) => {
       // Validate race data
-      try {
-        validateRaceData({
-          name: r.name,
-          round: r.round
-        });
-      } catch (err) {
-        console.error(`Invalid race data: ${err.message}`);
-        processingErrors.push({ round: r.round, error: `Invalid race data: ${err.message}` });
-        await sleep(THROTTLE_MS);
-        continue;
-      }
+      validateRaceData({
+        name: race.name,
+        round: race.round
+      });
 
-      // Validate driver data before upsert
-      try {
-        validateDriverData(r.winner);
-      } catch (err) {
-        console.error(`Invalid driver data: ${err.message}`);
-        processingErrors.push({ round: r.round, error: `Invalid driver data: ${err.message}` });
-        await sleep(THROTTLE_MS);
-        continue;
-      }
+      // Validate driver data
+      validateDriverData(race.winner);
       
-      // Upsert driver
-      const driver = await prisma.driver.upsert({
-        where: { driverRef: r.winner.driverRef },
-        update: { name: r.winner.name },
-        create: { driverRef: r.winner.driverRef, name: r.winner.name },
-      });
+      // Upsert driver and get the driver record
+      const driver = await dbService.upsertDriver(race.winner);
+      
+      // Upsert race with winner relation
+      await dbService.upsertRace(
+        year,
+        race.round,
+        race.name,
+        driver.id
+      );
+    },
+    'race' // Item name for logging
+  );
 
-      // Upsert race
-      await prisma.race.upsert({
-        where: { seasonYear_round: { seasonYear: year, round: r.round } },
-        update: { name: r.name, winnerDriverId: driver.id },
-        create: {
-          seasonYear: year,
-          round: r.round,
-          name: r.name,
-          winnerDriverId: driver.id,
-        },
-      });
-
-      // throttle to avoid proxy limits
-      await sleep(THROTTLE_MS);
-    } catch (err) {
-      // Catch any other errors during race processing to prevent complete failure
-      console.error(`Error processing race round ${r.round}: ${err.message}`);
-      processingErrors.push({ round: r.round, error: err.message });
-      await sleep(THROTTLE_MS);
-      continue;
-    }
+  // Log errors if any occurred during processing
+  if (processResult.errors.length > 0) {
+    console.error(`Completed with ${processResult.errors.length} errors:`,  
+      processResult.errors.map(e => `Race ${e.id}: ${e.error}`).join(', '));
   }
 
-  // final query
-  existing = await prisma.race.findMany({
-    where: { seasonYear: year },
-    include: { winner: true, 
-      season: { select: { championDriverId: true } } 
-    },
-    orderBy: { round: 'asc' },
-  });
+  // Final query to get all races with relations
+  existing = await dbService.findRacesBySeason(year);
+  
   // Log completion with timing information
-  console.log(formatTimingLog(startTime, 'getRacesBySeason', { year, races: existing.length }));
+  console.log(formatTimingLog(startTime, 'getRacesBySeason', { 
+    year, 
+    races: existing.length,
+    processed: processResult.processedCount,
+    errors: processResult.errors.length 
+  }));
   
   return existing;
 }
