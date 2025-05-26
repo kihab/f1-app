@@ -15,51 +15,59 @@
  *         description: Season year to retrieve races for
  *     responses:
  *       '200':
- *         description: A JSON array of races for that season.
+ *         description: A JSON array of races for that season wrapped in a data object.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   round:
- *                     type: integer
- *                     example: 1
- *                   name:
- *                     type: string
- *                     example: "Australian Grand Prix"
- *                   url:
- *                     type: string
- *                     nullable: true
- *                     example: "https://en.wikipedia.org/wiki/2025_Australian_Grand_Prix"
- *                   date:
- *                     type: string
- *                     format: date
- *                     nullable: true
- *                     example: "2025-03-16"
- *                   country:
- *                     type: string
- *                     nullable: true
- *                     example: "Australia"
- *                   isChampion:
- *                     type: boolean
- *                     example: true
- *                   winner:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
  *                     type: object
  *                     properties:
- *                       id:
+ *                       round:
  *                         type: integer
- *                         example: 4
+ *                         example: 1
  *                       name:
  *                         type: string
- *                         example: "Lando Norris"
- *                       driverRef:
+ *                         example: "Australian Grand Prix"
+ *                       url:
  *                         type: string
- *                         example: "norris"
- *                       nationality:
+ *                         nullable: true
+ *                         example: "https://en.wikipedia.org/wiki/2025_Australian_Grand_Prix"
+ *                       date:
  *                         type: string
- *                         example: "British"
+ *                         format: date
+ *                         nullable: true
+ *                         example: "2025-03-16"
+ *                       country:
+ *                         type: string
+ *                         nullable: true
+ *                         example: "Australia"
+ *                       isChampion:
+ *                         type: boolean
+ *                         example: true
+ *                       winner:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 4
+ *                           name:
+ *                             type: string
+ *                             example: "Lando Norris"
+ *                           driverRef:
+ *                             type: string
+ *                             example: "norris"
+ *                           nationality:
+ *                             type: string
+ *                             example: "British"
+ *                 message:
+ *                   type: string
+ *                   nullable: true
+ *                   description: Optional message, provided when the data array is empty
+ *                   example: "No race data available for 2025. The season may not have started or data is not yet available."
  */
 
 // routes/races.js
