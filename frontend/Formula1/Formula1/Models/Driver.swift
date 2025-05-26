@@ -8,4 +8,5 @@ struct Driver: Identifiable {
     let id: Int         // Driver's unique ID, typically from the API
     let name: String    // Driver's full name
     let driverRef: String // Driver's reference string
+    let nationality: String? // Driver's nationality
 }

@@ -8,4 +8,5 @@ struct DriverDTO: Codable {
     let id: Int         // Driver's unique ID from the API/database
     let name: String    // Driver's full name
     let driverRef: String // Driver's reference string (e.g., "hamilton")
+    let nationality: String? // Driver's nationality (e.g., "British")
 }

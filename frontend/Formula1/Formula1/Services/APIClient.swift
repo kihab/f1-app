@@ -33,13 +33,19 @@ class APIClient: APIClientProtocol {
         }
         
         do {
-            let seasonDTOs = try JSONDecoder().decode([SeasonDTO].self, from: data)
-            // Map DTOs to Domain Models
+            // Decode using the new APIResponse wrapper that matches the backend response structure
+            let apiResponse = try JSONDecoder().decode(APIResponse<[SeasonDTO]>.self, from: data)
+            
+            // Extract the seasons array from the data field
+            let seasonDTOs = apiResponse.data
+            
+            // Map DTOs to Domain Models, now including nationality
             let seasons = seasonDTOs.map { dto in
                 Season(year: dto.year, 
                        champion: Driver(id: dto.champion.id, 
                                         name: dto.champion.name, 
-                                        driverRef: dto.champion.driverRef))
+                                        driverRef: dto.champion.driverRef,
+                                        nationality: dto.champion.nationality))
             }
             return seasons
         } catch {
@@ -75,15 +81,24 @@ class APIClient: APIClientProtocol {
         }
         
         do {
-            let raceDTOs = try JSONDecoder().decode([RaceDTO].self, from: data)
-            // Map DTOs to Domain Models
+            // Decode using the new APIResponse wrapper that matches the backend response structure
+            let apiResponse = try JSONDecoder().decode(APIResponse<[RaceDTO]>.self, from: data)
+            
+            // Extract the races array from the data field
+            let raceDTOs = apiResponse.data
+            
+            // Map DTOs to Domain Models, now including nationality
             let races = raceDTOs.map { dto in
                 Race(round: dto.round,
                      name: dto.name,
+                     url: dto.url,
+                     date: dto.date,
+                     country: dto.country,
                      isChampion: dto.isChampion,
                      winner: Driver(id: dto.winner.id,
                                     name: dto.winner.name,
-                                    driverRef: dto.winner.driverRef))
+                                    driverRef: dto.winner.driverRef,
+                                    nationality: dto.winner.nationality))
             }
             return races
         } catch {

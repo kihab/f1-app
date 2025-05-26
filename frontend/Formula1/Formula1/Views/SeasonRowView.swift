@@ -12,6 +12,12 @@ struct SeasonRowView: View {
                 .font(.headline)
             Text("Champion: \(season.champion.name)")
                 .font(.subheadline)
+            // Display nationality if available
+            if let nationality = season.champion.nationality {
+                Text("Nationality: \(nationality)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
         .padding(.vertical, 8) // Add some padding for better spacing in the list
     }
