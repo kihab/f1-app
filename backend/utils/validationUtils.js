@@ -21,6 +21,7 @@ function validateYear(year) {
  * @param {Object} driver - The driver object to validate
  * @param {string} driver.driverRef - Driver reference ID
  * @param {string} driver.name - Driver name
+ * @param {string} [driver.nationality] - Optional driver nationality
  * @throws {Error} If validation fails
  */
 function validateDriverData(driver) {
@@ -38,6 +39,16 @@ function validateDriverData(driver) {
   }
   if (driver.name.length > 100) {
     throw new Error('Driver name exceeds 100 characters');
+  }
+  
+  // Validate nationality if provided
+  if (driver.nationality !== undefined && driver.nationality !== null) {
+    if (typeof driver.nationality !== 'string') {
+      throw new Error('Driver nationality must be a string');
+    }
+    if (driver.nationality.length > 50) {
+      throw new Error('Driver nationality exceeds 50 characters');
+    }
   }
 }
 

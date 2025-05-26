@@ -101,6 +101,7 @@ async function fetchChampionDriver(year, attempt = 0) {
     return {
       driverRef: driver.driverId,
       name: `${driver.givenName} ${driver.familyName}`,
+      nationality: driver.nationality, // Extract nationality from the API response
     };
   } catch (err) {
     // Wrap the error with more context about the operation
@@ -144,6 +145,7 @@ async function fetchSeasonResults(year, attempt = 0) {
           ? {
               driverRef: winnerRec.driverId,
               name: `${winnerRec.givenName} ${winnerRec.familyName}`,
+              nationality: winnerRec.nationality, // Extract nationality from the API response
             }
           : null,
       };

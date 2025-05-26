@@ -21,7 +21,8 @@ function transformRaceToDto(race) {
     winner: {
       id: race.winner.id,
       name: race.winner.name,
-      driverRef: race.winner.driverRef
+      driverRef: race.winner.driverRef,
+      nationality: race.winner.nationality // Include nationality in race winner data
     }
   };
 }
@@ -50,6 +51,7 @@ function transformSeasonToDto(season) {
       id: season.champion.id,
       name: season.champion.name,
       driverRef: season.champion.driverRef,
+      nationality: season.champion.nationality, // Include nationality in champion data
     } : null,
   };
 }

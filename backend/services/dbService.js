@@ -19,14 +19,21 @@ function createDbService(dependencies = {}) {
 
 /**
  * Upserts a driver record in the database
- * @param {Object} driver - Driver data with driverRef and name
+ * @param {Object} driver - Driver data with driverRef, name, and optional nationality
  * @returns {Promise<Object>} - The upserted driver record
  */
 async function upsertDriver(driver) {
   return prisma.driver.upsert({
     where: { driverRef: driver.driverRef },
-    update: { name: driver.name },
-    create: { driverRef: driver.driverRef, name: driver.name },
+    update: { 
+      name: driver.name,
+      nationality: driver.nationality, // Update nationality if provided
+    },
+    create: { 
+      driverRef: driver.driverRef, 
+      name: driver.name,
+      nationality: driver.nationality, // Include nationality in new records
+    },
   });
 }
 

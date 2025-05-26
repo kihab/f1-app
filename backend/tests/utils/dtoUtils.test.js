@@ -15,7 +15,8 @@ describe('dtoUtils', () => {
         winner: {
           id: 'driver1',
           name: 'Max Verstappen',
-          driverRef: 'verstappen'
+          driverRef: 'verstappen',
+          nationality: 'Dutch' // Add nationality to test data
         },
         season: {
           championDriverId: 'driver1'
@@ -31,7 +32,8 @@ describe('dtoUtils', () => {
         winner: {
           id: 'driver1',
           name: 'Max Verstappen',
-          driverRef: 'verstappen'
+          driverRef: 'verstappen',
+          nationality: 'Dutch' // Verify nationality in test assertion
         }
       });
     });
@@ -43,7 +45,8 @@ describe('dtoUtils', () => {
         winner: {
           id: 'driver2',
           name: 'Lewis Hamilton',
-          driverRef: 'hamilton'
+          driverRef: 'hamilton',
+          nationality: 'British' // Add nationality to test data
         },
         season: {
           championDriverId: 'driver1'
@@ -59,7 +62,8 @@ describe('dtoUtils', () => {
         winner: {
           id: 'driver2',
           name: 'Lewis Hamilton',
-          driverRef: 'hamilton'
+          driverRef: 'hamilton',
+          nationality: 'British' // Verify nationality in test assertion
         }
       });
     });
@@ -84,13 +88,23 @@ describe('dtoUtils', () => {
         {
           round: 1,
           name: 'Austrian Grand Prix',
-          winner: { id: 'driver1', name: 'Max Verstappen', driverRef: 'verstappen' },
+          winner: { 
+            id: 'driver1', 
+            name: 'Max Verstappen', 
+            driverRef: 'verstappen', 
+            nationality: 'Dutch' // Add nationality to test data
+          },
           season: { championDriverId: 'driver1' }
         },
         {
           round: 2,
           name: 'Styrian Grand Prix',
-          winner: { id: 'driver2', name: 'Lewis Hamilton', driverRef: 'hamilton' },
+          winner: { 
+            id: 'driver2', 
+            name: 'Lewis Hamilton', 
+            driverRef: 'hamilton', 
+            nationality: 'British' // Add nationality to test data
+          },
           season: { championDriverId: 'driver1' }
         }
       ];
@@ -102,13 +116,23 @@ describe('dtoUtils', () => {
           round: 1,
           name: 'Austrian Grand Prix',
           isChampion: true,
-          winner: { id: 'driver1', name: 'Max Verstappen', driverRef: 'verstappen' }
+          winner: { 
+            id: 'driver1', 
+            name: 'Max Verstappen', 
+            driverRef: 'verstappen',
+            nationality: 'Dutch' // Verify nationality in test assertion
+          }
         },
         {
           round: 2,
           name: 'Styrian Grand Prix',
           isChampion: false,
-          winner: { id: 'driver2', name: 'Lewis Hamilton', driverRef: 'hamilton' }
+          winner: { 
+            id: 'driver2', 
+            name: 'Lewis Hamilton', 
+            driverRef: 'hamilton',
+            nationality: 'British' // Verify nationality in test assertion
+          }
         }
       ]);
     });
@@ -150,7 +174,8 @@ describe('dtoUtils', () => {
         champion: {
           id: 'driver1',
           name: 'Max Verstappen',
-          driverRef: 'verstappen'
+          driverRef: 'verstappen',
+          nationality: 'Dutch' // Add nationality to test data
         }
       };
 
@@ -161,7 +186,8 @@ describe('dtoUtils', () => {
         champion: {
           id: 'driver1',
           name: 'Max Verstappen',
-          driverRef: 'verstappen'
+          driverRef: 'verstappen',
+          nationality: 'Dutch' // Verify nationality in test assertion
         }
       });
     });
@@ -190,11 +216,21 @@ describe('dtoUtils', () => {
       const seasons = [
         {
           year: 2023,
-          champion: { id: 'driver1', name: 'Max Verstappen', driverRef: 'verstappen' }
+          champion: { 
+            id: 'driver1', 
+            name: 'Max Verstappen', 
+            driverRef: 'verstappen',
+            nationality: 'Dutch' // Add nationality to test data
+          }
         },
         {
           year: 2022,
-          champion: { id: 'driver1', name: 'Max Verstappen', driverRef: 'verstappen' }
+          champion: { 
+            id: 'driver1', 
+            name: 'Max Verstappen', 
+            driverRef: 'verstappen',
+            nationality: 'Dutch' // Add nationality to test data
+          }
         }
       ];
 
@@ -203,11 +239,21 @@ describe('dtoUtils', () => {
       expect(dtos).toEqual([
         {
           year: 2023,
-          champion: { id: 'driver1', name: 'Max Verstappen', driverRef: 'verstappen' }
+          champion: { 
+            id: 'driver1', 
+            name: 'Max Verstappen', 
+            driverRef: 'verstappen',
+            nationality: 'Dutch' // Verify nationality in test assertion
+          }
         },
         {
           year: 2022,
-          champion: { id: 'driver1', name: 'Max Verstappen', driverRef: 'verstappen' }
+          champion: { 
+            id: 'driver1', 
+            name: 'Max Verstappen', 
+            driverRef: 'verstappen',
+            nationality: 'Dutch' // Verify nationality in test assertion
+          }
         }
       ]);
     });
