@@ -139,8 +139,10 @@ async function fetchSeasonResults(year, attempt = 0) {
       return {
         round: parseInt(r.round, 10),
         name: r.raceName,
-        date: r.date,
-        time: r.time,
+        url: r.url, // Official race URL from Ergast API
+        date: r.date, // Race date (YYYY-MM-DD)
+        country: r.Circuit?.Location?.country || null, // Country extracted from Circuit.Location
+        time: r.time, // Race start time (may be undefined)
         winner: winnerRec
           ? {
               driverRef: winnerRec.driverId,

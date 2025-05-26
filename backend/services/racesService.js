@@ -125,12 +125,15 @@ function createRacesService(deps = {}) {
       // Upsert driver and get the driver record
       const driver = await dbService.upsertDriver(race.winner);
       
-      // Upsert race with winner relation
+      // Upsert race with winner relation and persist new fields
       await dbService.upsertRace(
         year,
         race.round,
         race.name,
-        driver.id
+        driver.id,
+        race.url,    // Official race URL
+        race.date,   // Race date (YYYY-MM-DD)
+        race.country // Country of the race
       );
     },
     'race' // Item name for logging

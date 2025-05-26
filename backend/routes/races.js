@@ -29,6 +29,19 @@
  *                   name:
  *                     type: string
  *                     example: "Australian Grand Prix"
+ *                   url:
+ *                     type: string
+ *                     nullable: true
+ *                     example: "https://en.wikipedia.org/wiki/2025_Australian_Grand_Prix"
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                     nullable: true
+ *                     example: "2025-03-16"
+ *                   country:
+ *                     type: string
+ *                     nullable: true
+ *                     example: "Australia"
  *                   isChampion:
  *                     type: boolean
  *                     example: true
@@ -44,6 +57,9 @@
  *                       driverRef:
  *                         type: string
  *                         example: "norris"
+ *                       nationality:
+ *                         type: string
+ *                         example: "British"
  */
 
 // routes/races.js

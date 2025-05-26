@@ -17,6 +17,9 @@ function transformRaceToDto(race) {
   return {
     round: race.round,
     name: race.name,
+    url: race.url, // Official race URL
+    date: race.date, // Race date (YYYY-MM-DD)
+    country: race.country, // Country of the race
     isChampion: isChamp,
     winner: {
       id: race.winner.id,

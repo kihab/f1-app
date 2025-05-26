@@ -56,18 +56,24 @@ async function upsertSeason(year, championDriverId = null) {
  * @param {number} seasonYear - Season year
  * @param {number} round - Race round
  * @param {string} name - Race name
- * @param {string} winnerDriverId - ID of winner driver
+ * @param {number} winnerDriverId - ID of winner driver
+ * @param {string} [url] - Official race URL (optional)
+ * @param {string} [date] - Race date (YYYY-MM-DD, optional)
+ * @param {string} [country] - Country of the race (optional)
  * @returns {Promise<Object>} - The upserted race record
  */
-async function upsertRace(seasonYear, round, name, winnerDriverId) {
+async function upsertRace(seasonYear, round, name, winnerDriverId, url = null, date = null, country = null) {
   return prisma.race.upsert({
     where: { seasonYear_round: { seasonYear, round } },
-    update: { name, winnerDriverId },
+    update: { name, winnerDriverId, url, date, country }, // Update new fields
     create: {
       seasonYear,
       round,
       name,
       winnerDriverId,
+      url,    // Persist official race URL
+      date,   // Persist race date
+      country // Persist country
     },
   });
 }

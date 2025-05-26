@@ -37,6 +37,10 @@ model Race {
   winner           Driver @relation("RaceWinner", fields: [winnerDriverId], references: [id])
   season           Season @relation(fields: [seasonYear], references: [year])
 
+  url              String? @db.VarChar(255) // Official race URL (optional)
+  date             String? @db.VarChar(20)  // Race date (YYYY-MM-DD, optional)
+  country          String? @db.VarChar(100) // Country of the race (optional)
+
   @@unique([seasonYear, round])
   @@index([seasonYear])
   @@index([winnerDriverId])

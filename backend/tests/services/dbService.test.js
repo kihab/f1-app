@@ -174,7 +174,10 @@ describe('dbService', () => {
         seasonYear: 2023,
         round: 1,
         name: 'Bahrain Grand Prix',
-        winnerDriverId: 'driver1'
+        winnerDriverId: 'driver1',
+        url: null,
+        date: null,
+        country: null
       };
       mockPrisma.race.upsert.mockResolvedValue(mockRace);
       
@@ -184,16 +187,48 @@ describe('dbService', () => {
       // Verify prisma was called correctly
       expect(mockPrisma.race.upsert).toHaveBeenCalledWith({
         where: { seasonYear_round: { seasonYear: 2023, round: 1 } },
-        update: { name: 'Bahrain Grand Prix', winnerDriverId: 'driver1' },
+        update: { name: 'Bahrain Grand Prix', winnerDriverId: 'driver1', url: null, date: null, country: null },
         create: {
           seasonYear: 2023,
           round: 1,
           name: 'Bahrain Grand Prix',
           winnerDriverId: 'driver1',
+          url: null,
+          date: null,
+          country: null
         },
       });
       
       // Verify the result
+      expect(result).toBe(mockRace);
+    });
+
+    test('should call prisma.race.upsert with non-null url, date, and country', async () => {
+      const mockRace = {
+        id: 'race2',
+        seasonYear: 2023,
+        round: 2,
+        name: 'Australian Grand Prix',
+        winnerDriverId: 'driver2',
+        url: 'https://example.com/australia',
+        date: '2023-04-02',
+        country: 'Australia'
+      };
+      mockPrisma.race.upsert.mockResolvedValue(mockRace);
+      const result = await dbService.upsertRace(2023, 2, 'Australian Grand Prix', 'driver2', 'https://example.com/australia', '2023-04-02', 'Australia');
+      expect(mockPrisma.race.upsert).toHaveBeenCalledWith({
+        where: { seasonYear_round: { seasonYear: 2023, round: 2 } },
+        update: { name: 'Australian Grand Prix', winnerDriverId: 'driver2', url: 'https://example.com/australia', date: '2023-04-02', country: 'Australia' },
+        create: {
+          seasonYear: 2023,
+          round: 2,
+          name: 'Australian Grand Prix',
+          winnerDriverId: 'driver2',
+          url: 'https://example.com/australia',
+          date: '2023-04-02',
+          country: 'Australia'
+        },
+      });
       expect(result).toBe(mockRace);
     });
 

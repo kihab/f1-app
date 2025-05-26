@@ -290,15 +290,26 @@ describe('ergastClient - fetchSeasonResults', () => {
       name: 'Bahrain Grand Prix',
       date: '2023-03-05',
       time: '15:00:00Z',
+      url: undefined, // url not present in mock
+      country: null,  // country not present in mock
       winner: {
         driverRef: 'max_verstappen',
-        name: 'Max Verstappen'
+        name: 'Max Verstappen',
+        nationality: undefined // nationality not present in mock
       }
     });
-    expect(result[1].winner.driverRef).toBe('sergio_perez');
+    expect(result[1]).toMatchObject({
+      winner: {
+        driverRef: 'sergio_perez',
+        name: 'Sergio Perez',
+        nationality: undefined
+      }
+    });
   });
 
   test('should handle race with no winner data', async () => {
+    // Also verify new fields are present with expected values
+
     const mockYear = 2023;
     
     // Mock API response with a race missing winner data
@@ -343,6 +354,57 @@ describe('ergastClient - fetchSeasonResults', () => {
     
     await expect(fetchSeasonResults(2023)).rejects.toThrow('Error fetching races for 2023');
     expect(axios.get).toHaveBeenCalledTimes(1);
+  });
+
+  test('should map url, country, and nationality fields when present', async () => {
+    const mockYear = 2023;
+    const mockApiResponse = {
+      data: {
+        MRData: {
+          RaceTable: {
+            Races: [
+              {
+                round: '1',
+                raceName: 'Australian Grand Prix',
+                date: '2023-04-02',
+                time: '06:00:00Z',
+                url: 'https://example.com/australia',
+                Circuit: {
+                  Location: {
+                    country: 'Australia'
+                  }
+                },
+                Results: [
+                  {
+                    Driver: {
+                      driverId: 'charles_leclerc',
+                      givenName: 'Charles',
+                      familyName: 'Leclerc',
+                      nationality: 'Monegasque'
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    };
+    axios.get.mockResolvedValueOnce(mockApiResponse);
+    const result = await fetchSeasonResults(mockYear);
+    expect(result[0]).toEqual({
+      round: 1,
+      name: 'Australian Grand Prix',
+      date: '2023-04-02',
+      time: '06:00:00Z',
+      url: 'https://example.com/australia',
+      country: 'Australia',
+      winner: {
+        driverRef: 'charles_leclerc',
+        name: 'Charles Leclerc',
+        nationality: 'Monegasque'
+      }
+    });
   });
 
   test('should handle empty race list correctly', async () => {
