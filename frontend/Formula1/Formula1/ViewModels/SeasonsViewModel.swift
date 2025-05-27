@@ -15,7 +15,7 @@ class SeasonsViewModel: ObservableObject {
     @Published var lastError: NetworkError? = nil // Store the actual error for context
     
     // Used to monitor network connectivity
-    private var networkMonitor = NetworkMonitor()
+    private var networkMonitor: NetworkMonitor
     private var cancellables = Set<AnyCancellable>()
     
     // Made internal to be accessible by SeasonsListView for passing to RacesViewModel
@@ -23,9 +23,12 @@ class SeasonsViewModel: ObservableObject {
     internal let apiClient: APIClientProtocol 
     
     /// Initializes the ViewModel with a dependency on an API client.
-    /// - Parameter apiClient: An object conforming to `APIClientProtocol` for fetching data.
-    init(apiClient: APIClientProtocol) {
+    /// - Parameters:
+    ///   - apiClient: An object conforming to `APIClientProtocol` for fetching data.
+    ///   - networkMonitor: A NetworkMonitor to check for connectivity status, defaults to a new instance.
+    init(apiClient: APIClientProtocol, networkMonitor: NetworkMonitor = NetworkMonitor()) {
         self.apiClient = apiClient
+        self.networkMonitor = networkMonitor
         
         // Monitor network status changes
         networkMonitor.$isConnected

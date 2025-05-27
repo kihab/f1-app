@@ -16,7 +16,7 @@ class RacesViewModel: ObservableObject {
     @Published var navigationTitle: String = "Races"
     
     // Used to monitor network connectivity
-    private var networkMonitor = NetworkMonitor()
+    private var networkMonitor: NetworkMonitor
     private var cancellables = Set<AnyCancellable>()
     
     private let year: Int
@@ -26,9 +26,11 @@ class RacesViewModel: ObservableObject {
     /// - Parameters:
     ///   - year: The year of the season for which to fetch races.
     ///   - apiClient: An object conforming to `APIClientProtocol` for fetching data.
-    init(year: Int, apiClient: APIClientProtocol) {
+    ///   - networkMonitor: A NetworkMonitor to check for connectivity status, defaults to a new instance.
+    init(year: Int, apiClient: APIClientProtocol, networkMonitor: NetworkMonitor = NetworkMonitor()) {
         self.year = year
         self.apiClient = apiClient
+        self.networkMonitor = networkMonitor
         self.navigationTitle = "Races in \(year)"
         
         // Monitor network status changes
