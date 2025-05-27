@@ -7,18 +7,24 @@ struct SeasonRowView: View {
     let season: Season // The season data to display
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) { // Increased spacing between elements
             Text("Season: \(String(season.year))")
-                .font(.headline)
-            Text("Champion: \(season.champion.name)")
-                .font(.subheadline)
+                .font(FontManager.headline()) // Using FontManager for consistent styling
+            
+            HStack(spacing: 4) {
+                // Flag emoji based on nationality
+                Text(FlagManager.flagEmoji(for: season.champion.nationality))
+                Text("Champion: \(season.champion.name)")
+                    .font(FontManager.subheadline())
+            }
+            
             // Display nationality if available
             if let nationality = season.champion.nationality {
                 Text("Nationality: \(nationality)")
-                    .font(.caption)
+                    .font(FontManager.caption())
                     .foregroundColor(.secondary)
             }
         }
-        .padding(.vertical, 8) // Add some padding for better spacing in the list
+        .padding(.vertical, 10) // Increased vertical padding for better spacing
     }
 }
