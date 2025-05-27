@@ -19,7 +19,7 @@ struct SeasonsListView: View {
     private let apiClient: APIClientProtocol // Assuming viewModel was initialized with this
     
     // Background color for the app - light off-white color
-    private let backgroundColor = Color(red: 0.97, green: 0.97, blue: 0.97)
+    private let backgroundColor = Constants.UI.backgroundColor
 
     // Initializer to accept the ViewModel
     // We need to ensure the apiClient is accessible for navigation
@@ -48,12 +48,10 @@ struct SeasonsListView: View {
                     }
                     
                     if viewModel.isLoading {
-                        ProgressView("Loading Seasons...")
-                            .font(FontManager.body())
-                            .padding()
+                        LoadingView(message: Localizable.Loading.seasons, logoScale: 1.2)
                             .frame(maxHeight: .infinity) 
                     } else if viewModel.seasons.isEmpty && viewModel.errorMessage == nil {
-                        Text("No seasons data available. Try refreshing.")
+                        Text(Localizable.Home.noSeasonsAvailable)
                             .font(FontManager.body())
                             .foregroundColor(.secondary)
                             .padding()
@@ -74,28 +72,28 @@ struct SeasonsListView: View {
                                                     .foregroundColor(.gray)
                                                     .font(.system(size: 14, weight: .medium))
                                             }
-                                            .padding(.horizontal, 16) // Horizontal padding for content
+                                            .padding(.horizontal, Constants.UI.Spacing.standard) // Horizontal padding for content
                                         }
                                         .buttonStyle(PlainButtonStyle()) // Remove default button styling
                                         
                                         // Custom separator that doesn't touch edges
                                         if season.id != viewModel.seasons.last?.id {
                                             Divider()
-                                                .padding(.horizontal, 16) // Match horizontal content padding
+                                                .padding(.horizontal, Constants.UI.Spacing.standard) // Match horizontal content padding
                                         }
                                     }
                                 }
                             }
-                            .padding(.vertical, 8) // Vertical padding for the stack
+                            .padding(.vertical, Constants.UI.Spacing.small) // Vertical padding for the stack
                             .background(Color.white) // White background for the list items
-                            .cornerRadius(8) // Rounded corners
-                            .padding(.horizontal, 16) // Horizontal padding for the entire list
-                            .padding(.vertical, 8) // Vertical padding for the entire list
+                            .cornerRadius(Constants.UI.Size.standardCornerRadius) // Rounded corners
+                            .padding(.horizontal, Constants.UI.Spacing.standard) // Horizontal padding for the entire list
+                            .padding(.vertical, Constants.UI.Spacing.small) // Vertical padding for the entire list
                         }
                         .background(backgroundColor) // Set background color of ScrollView
                     }
                 }
-                .navigationTitle("Formula 1 Seasons")
+                .navigationTitle(Localizable.Home.title)
                 .navigationBarTitleDisplayMode(.large) // Use large title display mode
                 .onAppear {
                     Task {

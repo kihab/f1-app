@@ -42,6 +42,8 @@ Reusable utility functions and helpers:
 
 - `FlagManager.swift`: Converts country/nationality strings to flag emojis
 - `FontManager.swift`: Centralizes font styling across the app
+- `Constants.swift`: Central repository for app-wide constants (UI, network, etc.)
+- `Localizable.swift`: Structured string management for future localization support
 
 ### ViewModels/
 
@@ -58,6 +60,8 @@ UI components structured by screen:
 - `RacesListView.swift`: Screen showing races for a selected season
 - `SeasonRowView.swift`: Individual season row in list
 - `SeasonsListView.swift`: Main screen showing all seasons
+- `LoadingView.swift`: Reusable loading component with shimmer animation
+- `SplashScreenView.swift`: App launch screen with F1 logo and shimmer effect
 
 ### docs/
 
@@ -65,4 +69,4 @@ Project documentation:
 
 - `ios_app_structure.md`: Technical architecture overview
 - `ui_design_guide.md`: UI standards and visual components
-- `folder_structure.md`: This document
+- `folder_structure.md`: This document (folder structure and file responsibilities)

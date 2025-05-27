@@ -9,7 +9,7 @@ struct RacesListView: View {
 
     // Background color for the app - light off-white color
     // Using the same color as SeasonsListView for consistency
-    private let backgroundColor = Color(red: 0.97, green: 0.97, blue: 0.97)
+    private let backgroundColor = Constants.UI.backgroundColor
 
     var body: some View {
         ZStack {
@@ -32,12 +32,10 @@ struct RacesListView: View {
 
                 // Content based on loading state
                 if viewModel.isLoading {
-                    ProgressView("Loading Races...")
-                        .font(FontManager.body())
-                        .padding()
+                    LoadingView(message: Localizable.Loading.racesWithYear(viewModel.navigationTitle), logoScale: 1.0)
                         .frame(maxHeight: .infinity)
                 } else if viewModel.races.isEmpty && viewModel.errorMessage == nil {
-                    Text("No races available for that year.")
+                    Text(Localizable.Races.noRacesAvailable)
                         .font(FontManager.body())
                         .foregroundColor(.secondary)
                         .padding()
@@ -49,21 +47,21 @@ struct RacesListView: View {
                             ForEach(viewModel.races) { race in
                                 VStack(spacing: 0) {
                                     RaceRowView(race: race)
-                                        .padding(.horizontal, 16) // Match horizontal padding from seasons screen
+                                        .padding(.horizontal, Constants.UI.Spacing.standard) // Match horizontal padding from seasons screen
 
                                     // Custom separator that doesn't touch edges (matching Seasons screen)
                                     if race.id != viewModel.races.last?.id {
                                         Divider()
-                                            .padding(.horizontal, 16) // Match horizontal padding
+                                            .padding(.horizontal, Constants.UI.Spacing.standard) // Match horizontal padding
                                     }
                                 }
                             }
                         }
-                        .padding(.vertical, 8) // Vertical padding for the stack
+                        .padding(.vertical, Constants.UI.Spacing.small) // Vertical padding for the stack
                         .background(Color.white) // White background for the list items
-                        .cornerRadius(8) // Rounded corners
-                        .padding(.horizontal, 16) // Horizontal padding for the entire list
-                        .padding(.vertical, 8) // Vertical padding for the entire list
+                        .cornerRadius(Constants.UI.Size.standardCornerRadius) // Rounded corners
+                        .padding(.horizontal, Constants.UI.Spacing.standard) // Horizontal padding for the entire list
+                        .padding(.vertical, Constants.UI.Spacing.small) // Vertical padding for the entire list
                     }
                     .background(backgroundColor) // Set background color of ScrollView
                 }

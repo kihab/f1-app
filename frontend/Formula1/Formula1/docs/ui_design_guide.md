@@ -22,7 +22,16 @@ The app uses a consistent font system throughout:
 
 ## Screens
 
-### 1. Seasons List Screen
+### 1. Splash Screen
+
+Displayed when the app is first launched.
+
+**Content Elements**:
+- F1 logo centered on screen
+- Professional shimmer effect that passes across the logo
+- Neutral background matching app color scheme
+
+### 2. Seasons List Screen
 
 ![Seasons Screen](placeholder_for_seasons_screen.png)
 
@@ -38,7 +47,7 @@ The app uses a consistent font system throughout:
 - Country flags shown as emojis before champion names
 - Custom dividers between rows that don't touch screen edges
 
-### 2. Races List Screen
+### 3. Races List Screen
 
 ![Races Screen](placeholder_for_races_screen.png)
 
@@ -72,7 +81,11 @@ The app uses a consistent font system throughout:
 
 ### Loading States
 
-- Progress spinner with "Loading..." text when fetching data
+- Custom LoadingView with F1 logo and shimmer effect
+- Context-specific loading messages:
+  - "Warming up engines..." for seasons screen
+  - "Preparing race data..." for races screen
+- Shimmer animation provides subtle visual feedback during loading
 
 ### Error States
 
@@ -98,3 +111,18 @@ This multi-layered approach makes champion races immediately distinguishable.
 ### Country/Nationality Representation
 
 Flag emojis provide a visual identifier for countries and nationalities, improving scanability and adding visual interest without requiring image assets.
+
+### Internationalization
+
+The app is structured to support multiple languages in the future:
+- All user-facing strings are organized in a dedicated localization system
+- Context-based organization (Home, Races, Loading, Errors)
+- Text messages support parameterization for dynamic content
+
+### Design Constants
+
+The app maintains design consistency through a centralized constants system:
+- Standardized spacing values (small: 8pt, standard: 16pt, etc.)
+- Consistent corner radius (8pt)
+- Defined accent colors and styling metrics
+- Centralized asset names
