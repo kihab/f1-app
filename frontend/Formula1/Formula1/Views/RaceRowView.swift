@@ -7,53 +7,85 @@ struct RaceRowView: View {
     let race: Race // The race data to display
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 5) {
+        ZStack(alignment: .topTrailing) {
+            // Main content with left accent bar
+            HStack(spacing: 0) {
+                // Left accent bar for champion winners
+                if race.isChampion {
+                    Rectangle()
+                        .fill(Color.orange)
+                        .frame(width: 4)
+                        .padding(.vertical, 4)
+                } else {
+                    // Empty spacer with same width for consistent alignment
+                    Rectangle()
+                        .fill(Color.clear)
+                        .frame(width: 4)
+                        .padding(.vertical, 4)
+                }
+            
+            // Main content
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Round \(race.round): \(race.name)")
-                    .font(.headline)
+                    .font(FontManager.headline())
                 
                 // Display country and date if available
                 if let country = race.country {
-                    Text("Country: \(country)")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    HStack(spacing: 4) {
+                        Text(FlagManager.countryFlag(for: country))
+                        Text("Country: \(country)")
+                            .font(FontManager.subheadline())
+                            .foregroundColor(.secondary)
+                    }
                 }
                 
                 if let date = race.date {
                     Text("Date: \(date)")
-                        .font(.subheadline)
+                        .font(FontManager.subheadline())
                         .foregroundColor(.secondary)
                 }
                 
                 HStack(spacing: 4) {
                     Text("Winner:")
-                        .font(.subheadline)
+                        .font(FontManager.subheadline())
                     if race.isChampion {
-                        Text("🏆 \(race.winner.name)")
-                            .font(.subheadline.weight(.bold))
+                        Text(race.winner.name)
+                            .font(FontManager.subheadline().weight(.bold))
                             .foregroundColor(.orange)
                     } else {
                         Text(race.winner.name)
-                            .font(.subheadline)
+                            .font(FontManager.subheadline())
                     }
                 }
                 
                 // Display nationality if available
                 if let nationality = race.winner.nationality {
                     Text("Nationality: \(nationality)")
-                        .font(.caption)
+                        .font(FontManager.caption())
                         .foregroundColor(.secondary)
                 }
                 
-                // Add Wikipedia link if URL is available
+                // Add Wikipedia link if URL is available with underline to make it more obvious
                 if let url = race.url, let wikipediaURL = URL(string: url) {
-                    Link("Wikipedia", destination: wikipediaURL)
-                        .font(.caption)
+                    Link("Wikipedia Page", destination: wikipediaURL)
+                        .font(FontManager.caption())
                         .foregroundColor(.blue)
+                        .underline() // Make it more obvious as a link
                 }
             }
+            .padding(.leading, 8) // Add padding between accent bar and content
+            
             Spacer() // Pushes content to the left
         }
-        .padding(.vertical, 8)
+        .padding(.trailing, 30) // Extra trailing padding to accommodate trophy icon
+        .padding(.vertical, 10) // Match vertical padding from SeasonRowView
+            
+            // Trophy icon for champion in top right corner
+            if race.isChampion {
+                Text("🏆")
+                    .font(.system(size: 20))
+                    .padding([.top, .trailing], 8)
+            }
+        }
     }
 }
