@@ -2,15 +2,38 @@
 // Concrete implementation of APIClientProtocol using URLSession.
 
 import Foundation
+import Network
 
 /// Provides methods to fetch data from the Formula 1 API.
 class APIClient: APIClientProtocol {
     private let baseSeasonsURL = "http://localhost:3000/api/seasons"
+    private let networkMonitor = NetworkMonitor()
     
     /// Fetches a list of seasons from the API and maps them to domain models.
     /// - Returns: An array of `Season` domain models.
     /// - Throws: A `NetworkError` if any step of the process fails.
+    /// Maps HTTP status codes to appropriate NetworkError types
+    private func mapHTTPError(_ statusCode: Int) -> NetworkError {
+        switch statusCode {
+        case 404:
+            return .emptyData
+        case 408, 504:
+            return .requestFailed(NSError(domain: "APIClient", code: statusCode, userInfo: [NSLocalizedDescriptionKey: "Request timed out"]))
+        case 429:
+            return .rateLimited
+        case 503:
+            return .serverMaintenance
+        default:
+            return .httpError(statusCode: statusCode)
+        }
+    }
+    
     func fetchSeasons() async throws -> [Season] {
+        // Check for network connectivity before making the request
+        guard networkMonitor.isConnected else {
+            throw NetworkError.offline
+        }
+        
         guard let url = URL(string: baseSeasonsURL) else {
             throw NetworkError.invalidURL
         }
@@ -29,7 +52,7 @@ class APIClient: APIClientProtocol {
         }
         
         guard (200...299).contains(httpResponse.statusCode) else {
-            throw NetworkError.httpError(statusCode: httpResponse.statusCode)
+            throw mapHTTPError(httpResponse.statusCode)
         }
         
         do {
@@ -38,6 +61,12 @@ class APIClient: APIClientProtocol {
             
             // Extract the seasons array from the data field
             let seasonDTOs = apiResponse.data
+            
+            // Check if data is empty but response was successful
+            if seasonDTOs.isEmpty {
+                // This is technically a successful response with no data
+                return []
+            }
             
             // Map DTOs to Domain Models, now including nationality
             let seasons = seasonDTOs.map { dto in
@@ -59,6 +88,11 @@ class APIClient: APIClientProtocol {
     /// - Returns: An array of `Race` domain models.
     /// - Throws: A `NetworkError` if any step of the process fails.
     func fetchRaces(year: Int) async throws -> [Race] {
+        // Check for network connectivity before making the request
+        guard networkMonitor.isConnected else {
+            throw NetworkError.offline
+        }
+        
         guard let url = URL(string: "\(baseSeasonsURL)/\(year)/races") else {
             throw NetworkError.invalidURL
         }
@@ -77,7 +111,7 @@ class APIClient: APIClientProtocol {
         }
         
         guard (200...299).contains(httpResponse.statusCode) else {
-            throw NetworkError.httpError(statusCode: httpResponse.statusCode)
+            throw mapHTTPError(httpResponse.statusCode)
         }
         
         do {
@@ -86,6 +120,12 @@ class APIClient: APIClientProtocol {
             
             // Extract the races array from the data field
             let raceDTOs = apiResponse.data
+            
+            // Check if data is empty but response was successful
+            if raceDTOs.isEmpty {
+                // This is technically a successful response with no data
+                return []
+            }
             
             // Map DTOs to Domain Models, now including nationality
             let races = raceDTOs.map { dto in

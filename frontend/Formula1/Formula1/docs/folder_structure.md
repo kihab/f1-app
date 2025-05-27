@@ -44,6 +44,9 @@ Reusable utility functions and helpers:
 - `FontManager.swift`: Centralizes font styling across the app
 - `Constants.swift`: Central repository for app-wide constants (UI, network, etc.)
 - `Localizable.swift`: Structured string management for future localization support
+- `NetworkError.swift`: Custom error types for network operations
+- `ErrorRecoveryHelper.swift`: Provides user-friendly recovery suggestions for different error types
+- `NetworkMonitor.swift`: Monitors device network connectivity status
 
 ### ViewModels/
 
@@ -63,6 +66,13 @@ UI components structured by screen:
 - `LoadingView.swift`: Reusable loading component with shimmer animation
 - `SplashScreenView.swift`: App launch screen with F1 logo and shimmer effect
 
+#### Components/
+
+Reusable UI components:
+
+- `RetryButton.swift`: Reusable button for retry actions
+- `ErrorToast.swift`: Toast-style error notification component
+
 ### docs/
 
 Project documentation:
@@ -70,3 +80,4 @@ Project documentation:
 - `ios_app_structure.md`: Technical architecture overview
 - `ui_design_guide.md`: UI standards and visual components
 - `folder_structure.md`: This document (folder structure and file responsibilities)
+- `error_handling.md`: Error handling strategy and implementation details

@@ -89,13 +89,20 @@ Displayed when the app is first launched.
 
 ### Error States
 
-- Red error banner with white text for API or network errors
+- Toast-style error notifications appear at the bottom of the screen
+  - Clean, flat design with solid red background
+  - Concise error message with actionable suggestion
+  - Context-specific retry button for error recovery
+  - Critical errors persist until resolved
+  - Non-critical errors auto-dismiss after timeout
 - Empty state message when no data is available
 
 ### Interactive Elements
 
 - **Navigation**: Chevron indicators for row navigation
 - **Links**: Blue underlined text for Wikipedia links
+- **Pull-to-refresh**: Standard pull gesture on lists to refresh data
+- **Error recovery**: Context-specific buttons within error toasts
 
 ## Special Features
 

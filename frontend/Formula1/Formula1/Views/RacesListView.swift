@@ -2,6 +2,7 @@
 // View for displaying a list of races for a specific season.
 
 import SwiftUI
+import Combine
 
 struct RacesListView: View {
     // The ViewModel that provides state and logic for this view.
@@ -17,32 +18,31 @@ struct RacesListView: View {
             backgroundColor.edgesIgnoringSafeArea(.all)
 
             VStack(spacing: 0) {
-                // Display error message if present
-                if let error = viewModel.errorMessage {
-                    Text(error)
-                        .font(FontManager.body())
-                        .foregroundColor(.red)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.red.opacity(0.1))
-                        .cornerRadius(8)
-                        .padding(.horizontal)
-                        .padding(.top)
-                }
+                // Error handling now done via errorToast modifier
 
                 // Content based on loading state
                 if viewModel.isLoading {
                     LoadingView(message: Localizable.Loading.racesWithYear(viewModel.navigationTitle), logoScale: 1.0)
                         .frame(maxHeight: .infinity)
                 } else if viewModel.races.isEmpty && viewModel.errorMessage == nil {
-                    Text(Localizable.Races.noRacesAvailable)
-                        .font(FontManager.body())
-                        .foregroundColor(.secondary)
-                        .padding()
-                        .frame(maxHeight: .infinity)
+                    // Show empty state using NetworkError.emptyData and ErrorRecoveryHelper suggestion
+                    VStack {
+                        Text(NetworkError.emptyData.localizedDescription)
+                            .font(FontManager.body())
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 4)
+                        if let suggestion = ErrorRecoveryHelper.suggestion(for: .emptyData) {
+                            Text(suggestion)
+                                .font(FontManager.caption())
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .padding()
+                    .frame(maxHeight: .infinity)
                 } else if !viewModel.races.isEmpty {
                     // Use ScrollView with LazyVStack for more styling control (matching Seasons screen)
                     ScrollView {
+                        // Add refreshable modifier for pull-to-refresh functionality
                         LazyVStack(spacing: 0) {
                             ForEach(viewModel.races) { race in
                                 VStack(spacing: 0) {
@@ -63,6 +63,10 @@ struct RacesListView: View {
                         .padding(.horizontal, Constants.UI.Spacing.standard) // Horizontal padding for the entire list
                         .padding(.vertical, Constants.UI.Spacing.small) // Vertical padding for the entire list
                     }
+                    .refreshable {
+                        // Refresh data when user pulls down
+                        await viewModel.loadRaces()
+                    }
                     .background(backgroundColor) // Set background color of ScrollView
                 }
             }
@@ -75,5 +79,14 @@ struct RacesListView: View {
                 }
             }
         }
+        .errorToast(
+            error: viewModel.lastError,
+            errorMessage: viewModel.errorMessage,
+            retryAction: {
+                Task {
+                    await viewModel.retry()
+                }
+            }
+        )
     }
 }
