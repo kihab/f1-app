@@ -59,31 +59,32 @@ jobs:
       - name: Test app
         run: |
           xcodebuild \
-          -scheme Formula1 \
-          -sdk iphonesimulator \
-          -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' \
-          -skip-testing:Formula1UITests \
-          -enableCodeCoverage YES \
-          -resultBundlePath TestResults \
-          test
+            -scheme Formula1 \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' \
+            -skip-testing:Formula1UITests \
+            -enableCodeCoverage YES \
+            -resultBundlePath TestResults.xcresult \
+            test
+
 
       - name: Archive test results
         if: always()  # always run, even if previous steps fail
         uses: actions/upload-artifact@v4
         with:
           name: Formula1TestResults
-          path: TestResults
+          path: TestResults.xcresult
 
       - name: List contents of TestResults
-        run: ls -l TestResults
+        run: ls -l TestResults.xcresult
 
       - name: Enforce 70% Code Coverage
         run: |
-          if [ ! -e TestResults ]; then
-            echo "No xcresult bundle found at TestResults"
+          if [ ! -e TestResults.xcresult ]; then
+            echo "No xcresult bundle found at TestResults.xcresult"
             exit 1
           fi
-          COVERAGE=$(xcrun xccov view --report --json TestResults | \
+          COVERAGE=$(xcrun xccov view --report --json TestResults.xcresult | \
             /usr/bin/python3 -c "import sys, json; print(int(float(json.load(sys.stdin)['lineCoverage']) * 100))")
           echo "Coverage is $COVERAGE%"
           if [ "$COVERAGE" -lt 70 ]; then
