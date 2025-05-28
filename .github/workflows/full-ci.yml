@@ -72,14 +72,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Formula1TestResults
-          path: frontend/Formula1/TestResults
+          path: TestResults
 
       - name: List contents of TestResults
-        run: ls -l frontend/Formula1/TestResults
+        run: ls -l TestResults
 
       - name: Enforce 70% Code Coverage
         run: |
-          BUNDLE=$(ls frontend/Formula1/TestResults/*.xcresult | head -1)
+          BUNDLE=$(ls TestResults/*.xcresult | head -1)
           if [ ! -f "$BUNDLE" ]; then
             echo "No xcresult bundle found at $BUNDLE"
             exit 1
