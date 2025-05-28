@@ -63,6 +63,7 @@ jobs:
           -sdk iphonesimulator \
           -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' \
           -skip-testing:Formula1UITests \
+          -enableCodeCoverage YES \
           -resultBundlePath TestResults \
           test
       
@@ -72,4 +73,15 @@ jobs:
         with:
           name: Formula1TestResults
           path: frontend/Formula1/TestResults
+
+      - name: Enforce 70% Code Coverage
+        run: |
+          COVERAGE=$(xcrun xccov view --report --json frontend/Formula1/TestResults/*.xcresult | \
+            /usr/bin/python3 -c "import sys, json; print(int(float(json.load(sys.stdin)['lineCoverage']) * 100))")
+          echo "Coverage is $COVERAGE%"
+          if [ "$COVERAGE" -lt 70 ]; then
+            echo "Code coverage ($COVERAGE%) is below 70%."
+            exit 1
+          fi
+
 
