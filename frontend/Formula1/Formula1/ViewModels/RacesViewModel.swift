@@ -86,7 +86,9 @@ class RacesViewModel: ObservableObject {
             self.lastError = error
             print("NetworkError fetching races for year \(year): \(String(describing: error.errorDescription))")
         } catch {
-            self.errorMessage = "An unexpected error occurred while fetching races for year \(year): \(error.localizedDescription)"
+            self.errorMessage =
+                "An unexpected error occurred while fetching races for year \(year): " +
+                error.localizedDescription
             print("Unexpected error fetching races for year \(year): \(error.localizedDescription)")
         }
 

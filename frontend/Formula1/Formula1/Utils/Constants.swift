@@ -13,21 +13,21 @@ struct Constants {
     }
 
     /// UI-related constants
-    enum UI {
+    enum Colors {
         static let backgroundColor = Color(red: 0.97, green: 0.97, blue: 0.97)
         static let championAccentColor = Color.orange
+    }
 
-        enum Spacing {
-            static let standard: CGFloat = 16.0
-            static let small: CGFloat = 8.0
-            static let medium: CGFloat = 12.0
-            static let large: CGFloat = 20.0
-        }
+    enum Spacing {
+        static let standard: CGFloat = 16.0
+        static let small: CGFloat = 8.0
+        static let medium: CGFloat = 12.0
+        static let large: CGFloat = 20.0
+    }
 
-        enum Size {
-            static let accentBarWidth: CGFloat = 4.0
-            static let standardCornerRadius: CGFloat = 8.0
-        }
+    enum Size {
+        static let accentBarWidth: CGFloat = 4.0
+        static let standardCornerRadius: CGFloat = 8.0
     }
 
     /// Network-related constants
@@ -35,11 +35,6 @@ struct Constants {
         static let baseURL = "http://localhost:3000/api"
         static let seasonsEndpoint = "/seasons"
         static let racesEndpointPrefix = "/races/"
-
-        enum Timeout {
-            static let standard: TimeInterval = 30.0
-            static let extended: TimeInterval = 60.0
-        }
     }
 
     /// Accessibility identifiers for testing

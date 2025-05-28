@@ -7,7 +7,7 @@ struct SeasonRowView: View {
     let season: Season // The season data to display
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Constants.UI.Spacing.small) {
+        VStack(alignment: .leading, spacing: Constants.Spacing.small) {
             Text("\(Localizable.Home.seasonPrefix)\(String(season.year))")
                 .font(FontManager.headline())
 

@@ -12,7 +12,7 @@ struct FontManager {
     /// Tries to use SF Pro Medium if available, otherwise falls back to system font
     private static func createFont(size: CGFloat, weight: Font.Weight = .regular) -> Font {
         // Try to use the custom font first
-        if let _ = UIFont(name: customFontName, size: size) {
+        if UIFont(name: customFontName, size: size) != nil {
             return Font.custom(customFontName, size: size)
         }
 

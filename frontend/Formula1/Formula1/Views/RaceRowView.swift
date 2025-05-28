@@ -13,14 +13,14 @@ struct RaceRowView: View {
                 // Left accent bar for champion winners
                 if race.isChampion {
                     Rectangle()
-                        .fill(Constants.UI.championAccentColor)
-                        .frame(width: Constants.UI.Size.accentBarWidth)
+                        .fill(Constants.Colors.championAccentColor)
+                        .frame(width: Constants.Size.accentBarWidth)
                         .padding(.vertical, 4)
                 } else {
                     // Empty spacer with same width for consistent alignment
                     Rectangle()
                         .fill(Color.clear)
-                        .frame(width: Constants.UI.Size.accentBarWidth)
+                        .frame(width: Constants.Size.accentBarWidth)
                         .padding(.vertical, 4)
                 }
 
@@ -51,7 +51,7 @@ struct RaceRowView: View {
                     if race.isChampion {
                         Text(race.winner.name)
                             .font(FontManager.subheadline().weight(.bold))
-                            .foregroundColor(Constants.UI.championAccentColor)
+                            .foregroundColor(Constants.Colors.championAccentColor)
                     } else {
                         Text(race.winner.name)
                             .font(FontManager.subheadline())

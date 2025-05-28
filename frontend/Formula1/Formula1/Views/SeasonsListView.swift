@@ -20,7 +20,7 @@ struct SeasonsListView: View {
     private let apiClient: APIClientProtocol // Assuming viewModel was initialized with this
 
     // Background color for the app - light off-white color
-    private let backgroundColor = Constants.UI.backgroundColor
+    private let backgroundColor = Constants.Colors.backgroundColor
 
     // Initializer to accept the ViewModel
     // We need to ensure the apiClient is accessible for navigation
@@ -64,7 +64,11 @@ struct SeasonsListView: View {
                                 ForEach(viewModel.seasons) { season in
                                     VStack(spacing: 0) {
                                         // NavigationLink to RacesListView
-                                        NavigationLink(destination: RacesListView(viewModel: RacesViewModel(year: season.year, apiClient: self.apiClient))) {
+                                        NavigationLink(destination:
+                                                        RacesListView(viewModel:
+                                                                        RacesViewModel(year:
+                                                                                        season.year,
+                                                                                       apiClient: self.apiClient))) {
                                             HStack {
                                                 SeasonRowView(season: season)
                                                 Spacer()
@@ -73,23 +77,25 @@ struct SeasonsListView: View {
                                                     .foregroundColor(.gray)
                                                     .font(.system(size: 14, weight: .medium))
                                             }
-                                            .padding(.horizontal, Constants.UI.Spacing.standard) // Horizontal padding for content
+                                            .padding(.horizontal,
+                                                     Constants.Spacing.standard) // Horizontal padding for content
                                         }
                                         .buttonStyle(PlainButtonStyle()) // Remove default button styling
 
                                         // Custom separator that doesn't touch edges
                                         if season.id != viewModel.seasons.last?.id {
                                             Divider()
-                                                .padding(.horizontal, Constants.UI.Spacing.standard) // Match horizontal content padding
+                                                .padding(.horizontal,
+                                                         Constants.Spacing.standard) // Match horizontal content padding
                                         }
                                     }
                                 }
                             }
-                            .padding(.vertical, Constants.UI.Spacing.small) // Vertical padding for the stack
+                            .padding(.vertical, Constants.Spacing.small) // Vertical padding for the stack
                             .background(Color.white) // White background for the list items
-                            .cornerRadius(Constants.UI.Size.standardCornerRadius) // Rounded corners
-                            .padding(.horizontal, Constants.UI.Spacing.standard) // Horizontal padding for the entire list
-                            .padding(.vertical, Constants.UI.Spacing.small) // Vertical padding for the entire list
+                            .cornerRadius(Constants.Size.standardCornerRadius) // Rounded corners
+                            .padding(.horizontal, Constants.Spacing.standard) // Horizontal padding for the entire list
+                            .padding(.vertical, Constants.Spacing.small) // Vertical padding for the entire list
                         }
                         .refreshable {
                             // Refresh data when user pulls down

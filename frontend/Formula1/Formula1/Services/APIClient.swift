@@ -24,7 +24,9 @@ class APIClient: APIClientProtocol {
         case 404:
             return .emptyData
         case 408, 504:
-            return .requestFailed(NSError(domain: "APIClient", code: statusCode, userInfo: [NSLocalizedDescriptionKey: "Request timed out"]))
+            return .requestFailed(NSError(domain: "APIClient",
+                                          code: statusCode,
+                                          userInfo: [NSLocalizedDescriptionKey: "Request timed out"]))
         case 429:
             return .rateLimited
         case 503:

@@ -44,7 +44,7 @@ struct ErrorToast: View {
             if let retryAction = retryAction {
                 Button(action: {
                     retryAction()
-                }) {
+                }, label: {
                     Text(buttonText)
                         .font(FontManager.caption2())
                         .foregroundColor(.white)
@@ -52,7 +52,7 @@ struct ErrorToast: View {
                         .padding(.vertical, 4)
                         .background(Color.white.opacity(0.2))
                         .cornerRadius(4)
-                }
+                })
             }
         }
         .padding(.horizontal, 16)
