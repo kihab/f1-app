@@ -58,7 +58,7 @@ jobs:
 
       - name: Test app
         run: |
-          xcodebuild -scheme Formula1 -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' skip-testing:Formula1UITests test
+          xcodebuild -scheme Formula1 -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' -skip-testing:Formula1UITests test
       
       - name: Archive test results
         if: always()  # always run, even if previous steps fail
