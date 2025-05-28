@@ -66,22 +66,60 @@ jobs:
           -enableCodeCoverage YES \
           -resultBundlePath TestResults \
           test
+
+      - name: Zip .xcresult for easy download
+        run: |
+          BUNDLE=$(ls frontend/Formula1/TestResults/*.xcresult | head -1)
+          zip -r frontend/Formula1/f1app.xcresult.zip "$BUNDLE"
+
       
       - name: Archive test results
         if: always()  # always run, even if previous steps fail
         uses: actions/upload-artifact@v4
         with:
           name: Formula1TestResults
-          path: frontend/Formula1/TestResults
+          path: frontend/Formula1/f1app.xcresult.zip
+
+      - name: List contents of TestResults
+        run: ls -l frontend/Formula1/TestResults
 
       - name: Enforce 70% Code Coverage
         run: |
-          COVERAGE=$(xcrun xccov view --report --json frontend/Formula1/TestResults/*.xcresult | \
+          BUNDLE=$(ls frontend/Formula1/TestResults/*.xcresult | head -1)
+          if [ ! -f "$BUNDLE" ]; then
+            echo "No xcresult bundle found at $BUNDLE"
+            exit 1
+          fi
+          COVERAGE=$(xcrun xccov view --report --json "$BUNDLE" | \
             /usr/bin/python3 -c "import sys, json; print(int(float(json.load(sys.stdin)['lineCoverage']) * 100))")
           echo "Coverage is $COVERAGE%"
           if [ "$COVERAGE" -lt 70 ]; then
             echo "Code coverage ($COVERAGE%) is below 70%."
             exit 1
           fi
+
+      
+      # TODO: iOS Project doesn't have SPM dependencies yet.
+      # - name: Cache SPM
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ~/.swiftpm
+      #     key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-spm-
+
+
+      # TODO: Not very useful for now.      
+      # - name: Cache DerivedData
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: frontend/Formula1/DerivedData
+      #     key: ${{ runner.os }}-deriveddata-${{ github.sha }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-deriveddata-
+
+
+      
+
 
 
