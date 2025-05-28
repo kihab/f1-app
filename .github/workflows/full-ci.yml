@@ -79,18 +79,18 @@ jobs:
 
       - name: Enforce 70% Code Coverage
         run: |
-          BUNDLE=$(ls TestResults/*.xcresult | head -1)
-          if [ ! -f "$BUNDLE" ]; then
-            echo "No xcresult bundle found at $BUNDLE"
+          if [ ! -e TestResults ]; then
+            echo "No xcresult bundle found at TestResults"
             exit 1
           fi
-          COVERAGE=$(xcrun xccov view --report --json "$BUNDLE" | \
+          COVERAGE=$(xcrun xccov view --report --json TestResults | \
             /usr/bin/python3 -c "import sys, json; print(int(float(json.load(sys.stdin)['lineCoverage']) * 100))")
           echo "Coverage is $COVERAGE%"
           if [ "$COVERAGE" -lt 70 ]; then
             echo "Code coverage ($COVERAGE%) is below 70%."
             exit 1
           fi
+
 
       
       # TODO: iOS Project doesn't have SPM dependencies yet.
