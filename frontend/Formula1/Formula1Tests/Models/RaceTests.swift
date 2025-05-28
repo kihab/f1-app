@@ -9,9 +9,9 @@ import XCTest
 @testable import Formula1
 
 class RaceTests: XCTestCase {
-    
+
     // MARK: - Initialization Tests
-    
+
     func testRaceInitialization() {
         // Arrange
         let round = 1
@@ -21,7 +21,7 @@ class RaceTests: XCTestCase {
         let country = "Australia"
         let isChampion = true
         let winner = Driver(id: 1, name: "Max Verstappen", driverRef: "verstappen", nationality: "Dutch")
-        
+
         // Act
         let race = Race(
             round: round,
@@ -32,7 +32,7 @@ class RaceTests: XCTestCase {
             isChampion: isChampion,
             winner: winner
         )
-        
+
         // Assert
         XCTAssertEqual(race.round, round)
         XCTAssertEqual(race.name, name)
@@ -45,14 +45,14 @@ class RaceTests: XCTestCase {
         XCTAssertEqual(race.winner.driverRef, winner.driverRef)
         XCTAssertEqual(race.winner.nationality, winner.nationality)
     }
-    
+
     func testRaceInitializationWithOptionalProperties() {
         // Arrange
         let round = 1
         let name = "Australian Grand Prix"
         let isChampion = true
         let winner = Driver(id: 1, name: "Max Verstappen", driverRef: "verstappen", nationality: "Dutch")
-        
+
         // Act
         let race = Race(
             round: round,
@@ -63,7 +63,7 @@ class RaceTests: XCTestCase {
             isChampion: isChampion,
             winner: winner
         )
-        
+
         // Assert
         XCTAssertEqual(race.round, round)
         XCTAssertEqual(race.name, name)
@@ -72,9 +72,9 @@ class RaceTests: XCTestCase {
         XCTAssertNil(race.country)
         XCTAssertEqual(race.isChampion, isChampion)
     }
-    
+
     // MARK: - Identifiable Conformance Tests
-    
+
     func testIdentifiableConformance() {
         // Arrange
         let round = 3
@@ -87,7 +87,7 @@ class RaceTests: XCTestCase {
             isChampion: false,
             winner: Driver(id: 1, name: "Max Verstappen", driverRef: "verstappen", nationality: "Dutch")
         )
-        
+
         // Act & Assert
         XCTAssertEqual(race.id, round, "id should be equal to the round number")
     }

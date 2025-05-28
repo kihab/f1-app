@@ -113,6 +113,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 071F29B12DDBAEFE00F0FE77 /* Build configuration list for PBXNativeTarget "Formula1" */;
 			buildPhases = (
+				0712BAAA2DE7A89D007DB32B /* SwiftLint */,
 				071F29892DDBAEFC00F0FE77 /* Sources */,
 				071F298A2DDBAEFC00F0FE77 /* Frameworks */,
 				071F298B2DDBAEFC00F0FE77 /* Resources */,
@@ -242,6 +243,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0712BAAA2DE7A89D007DB32B /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]\nthen\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif command -v swiftlint >/dev/null 2>&1\nthen\n    swiftlint\nelse\n    echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		071F29892DDBAEFC00F0FE77 /* Sources */ = {
@@ -413,6 +436,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Formula1/Preview Content\"";
 				DEVELOPMENT_TEAM = NVQB3J5HF7;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -443,6 +467,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Formula1/Preview Content\"";
 				DEVELOPMENT_TEAM = NVQB3J5HF7;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

@@ -11,17 +11,17 @@ class RacesViewModel: ObservableObject {
     // Published properties to drive the UI
     @Published var races: [Race] = []
     @Published var isLoading: Bool = false
-    @Published var errorMessage: String? = nil
-    @Published var lastError: NetworkError? = nil // Store the actual error for context
+    @Published var errorMessage: String?
+    @Published var lastError: NetworkError? // Store the actual error for context
     @Published var navigationTitle: String = "Races"
-    
+
     // Used to monitor network connectivity
     private var networkMonitor: NetworkMonitor
     private var cancellables = Set<AnyCancellable>()
-    
+
     private let year: Int
     private let apiClient: APIClientProtocol
-    
+
     /// Initializes the ViewModel with a specific season year and an API client.
     /// - Parameters:
     ///   - year: The year of the season for which to fetch races.
@@ -32,7 +32,7 @@ class RacesViewModel: ObservableObject {
         self.apiClient = apiClient
         self.networkMonitor = networkMonitor
         self.navigationTitle = "Races in \(year)"
-        
+
         // Monitor network status changes
         networkMonitor.$isConnected
             .dropFirst() // Skip the initial value
@@ -45,7 +45,7 @@ class RacesViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
-    
+
     /// Loads races data for the specified year from the API.
     /// Updates `isLoading`, `races`, and `errorMessage` based on the fetch result.
     /// Loads races data for the specified year from the API.
@@ -53,12 +53,12 @@ class RacesViewModel: ObservableObject {
     func loadRaces() async {
         await fetchData()
     }
-    
+
     /// Retries the last failed request.
     func retry() async {
         await fetchData()
     }
-    
+
     /// Internal method to fetch data and handle errors
     private func fetchData() async {
         // Check for network connection first
@@ -67,15 +67,15 @@ class RacesViewModel: ObservableObject {
             self.lastError = .offline
             return
         }
-        
+
         isLoading = true
         errorMessage = nil
         lastError = nil
-        
+
         do {
             let fetchedRaces = try await apiClient.fetchRaces(year: self.year)
             self.races = fetchedRaces
-            
+
             // Check for empty data case
             if fetchedRaces.isEmpty {
                 self.errorMessage = NetworkError.emptyData.localizedDescription
@@ -86,10 +86,12 @@ class RacesViewModel: ObservableObject {
             self.lastError = error
             print("NetworkError fetching races for year \(year): \(String(describing: error.errorDescription))")
         } catch {
-            self.errorMessage = "An unexpected error occurred while fetching races for year \(year): \(error.localizedDescription)"
+            self.errorMessage =
+                "An unexpected error occurred while fetching races for year \(year): " +
+                error.localizedDescription
             print("Unexpected error fetching races for year \(year): \(error.localizedDescription)")
         }
-        
+
         isLoading = false
     }
 }

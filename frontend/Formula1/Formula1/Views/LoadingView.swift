@@ -6,18 +6,18 @@ import SwiftUI
 struct LoadingView: View {
     // Customizable loading message
     let message: String
-    
+
     // Optional scale factor for the logo
     var logoScale: CGFloat = 1.0
-    
+
     // Animation state for shimmer effect
     @State private var shimmerOffset: CGFloat = -0.25
-    
+
     init(message: String = "Loading data...", logoScale: CGFloat = 1.0) {
         self.message = message
         self.logoScale = logoScale
     }
-    
+
     var body: some View {
         VStack(spacing: 20) {
             // F1 Logo with shimmer effect overlay
@@ -27,7 +27,7 @@ struct LoadingView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 150 * logoScale, height: 70 * logoScale)
-                
+
                 // Shimmer effect
                 ShimmerEffect()
                     .frame(width: 150 * logoScale, height: 70 * logoScale)
@@ -37,7 +37,7 @@ struct LoadingView: View {
                             .aspectRatio(contentMode: .fit)
                     )
             }
-            
+
             // Custom loading message
             Text(message)
                 .font(FontManager.headline())
@@ -55,7 +55,7 @@ struct LoadingView: View {
 // MARK: - Shimmer Effect Component
 struct ShimmerEffect: View {
     @State private var movingOffset: CGFloat = -1
-    
+
     var body: some View {
         // Create gradient for shimmer effect
         LinearGradient(

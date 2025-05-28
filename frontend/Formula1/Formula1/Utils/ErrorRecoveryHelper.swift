@@ -23,13 +23,13 @@ class ErrorRecoveryHelper {
                 return "There was a problem with the request. Please try again."
             }
             return nil
-        case .requestFailed(_):
+        case .requestFailed:
             return "The request failed. Please check your connection and try again."
         default:
             return nil // No specific suggestion for other errors
         }
     }
-    
+
     /// Returns a button label appropriate for the error type
     static func buttonLabel(for error: NetworkError) -> String {
         switch error {

@@ -10,7 +10,7 @@ struct RacesListView: View {
 
     // Background color for the app - light off-white color
     // Using the same color as SeasonsListView for consistency
-    private let backgroundColor = Constants.UI.backgroundColor
+    private let backgroundColor = Constants.Colors.backgroundColor
 
     var body: some View {
         ZStack {
@@ -47,21 +47,23 @@ struct RacesListView: View {
                             ForEach(viewModel.races) { race in
                                 VStack(spacing: 0) {
                                     RaceRowView(race: race)
-                                        .padding(.horizontal, Constants.UI.Spacing.standard) // Match horizontal padding from seasons screen
+                                        .padding(.horizontal,
+                                                 Constants.Spacing.standard)
 
                                     // Custom separator that doesn't touch edges (matching Seasons screen)
                                     if race.id != viewModel.races.last?.id {
                                         Divider()
-                                            .padding(.horizontal, Constants.UI.Spacing.standard) // Match horizontal padding
+                                            .padding(.horizontal,
+                                                     Constants.Spacing.standard) // Match horizontal padding
                                     }
                                 }
                             }
                         }
-                        .padding(.vertical, Constants.UI.Spacing.small) // Vertical padding for the stack
+                        .padding(.vertical, Constants.Spacing.small) // Vertical padding for the stack
                         .background(Color.white) // White background for the list items
-                        .cornerRadius(Constants.UI.Size.standardCornerRadius) // Rounded corners
-                        .padding(.horizontal, Constants.UI.Spacing.standard) // Horizontal padding for the entire list
-                        .padding(.vertical, Constants.UI.Spacing.small) // Vertical padding for the entire list
+                        .cornerRadius(Constants.Size.standardCornerRadius) // Rounded corners
+                        .padding(.horizontal, Constants.Spacing.standard) // Horizontal padding for the entire list
+                        .padding(.vertical, Constants.Spacing.small) // Vertical padding for the entire list
                     }
                     .refreshable {
                         // Refresh data when user pulls down

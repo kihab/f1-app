@@ -17,7 +17,7 @@ class MockNetworkMonitor: NetworkMonitor {
         // Set default connection status
         _isConnected = true
     }
-    
+
     // Override the published property
     override var isConnected: Bool {
         get { _isConnected }
@@ -28,10 +28,10 @@ class MockNetworkMonitor: NetworkMonitor {
             super.isConnected = newValue
         }
     }
-    
+
     // Private backing variable to store the connection state
     private var _isConnected: Bool = true
-    
+
     // Helper for tests to simulate network changes
     func simulateNetworkChange(isConnected: Bool) {
         self.isConnected = isConnected

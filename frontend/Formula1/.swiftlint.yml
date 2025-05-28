@@ -1,0 +1,4 @@
+excluded:
+  - Formula1Tests
+  - Formula1UITests
+
