@@ -1,4 +1,4 @@
-name: Backend CI
+name: Full CI
 
 on:
   push:
@@ -41,3 +41,19 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t f1-backend:ci .
+  # ─────────────── iOS CI Job ───────────────
+  ios-ci:
+    runs-on: macos-14
+
+    defaults:
+      run:
+        working-directory: frontend/Formula1
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build app
+        run: |
+          xcodebuild -scheme Formula1 -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.4' build
+      
