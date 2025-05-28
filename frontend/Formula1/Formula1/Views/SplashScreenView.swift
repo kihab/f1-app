@@ -7,13 +7,13 @@ import SwiftUI
 struct SplashScreenView: View {
     // Animation state for shimmer effect
     @State private var startShimmer = false
-    
+
     var body: some View {
         ZStack {
             // Background color - using the same as our app
             Color(red: 0.97, green: 0.97, blue: 0.97)
                 .edgesIgnoringSafeArea(.all)
-            
+
             // F1 Logo with shimmer effect overlay
             ZStack {
                 // Base logo (static)
@@ -21,7 +21,7 @@ struct SplashScreenView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 200, height: 100)
-                
+
                 // Shimmer effect
                 if startShimmer {
                     SplashShimmerEffect()
@@ -46,7 +46,7 @@ struct SplashScreenView: View {
 // MARK: - Shimmer Effect Component for Splash Screen
 struct SplashShimmerEffect: View {
     @State private var movingOffset: CGFloat = -1
-    
+
     var body: some View {
         // Create gradient for shimmer effect
         LinearGradient(

@@ -7,7 +7,7 @@ import Foundation
 struct FlagManager {
     // MARK: - Neutral flag fallback
     private static let neutralFlag = "🏳️" // Neutral flag for unknown countries/nationalities
-    
+
     // MARK: - Common flag mapping
     // Shared map for both country and nationality lookups
     private static let flagMap: [String: String] = [
@@ -36,7 +36,7 @@ struct FlagManager {
         "Thai": "🇹🇭",
         "Russian": "🇷🇺",
         "Chinese": "🇨🇳",
-        
+
         // Countries (some overlap with nationalities but we list both for clarity)
         "United Kingdom": "🇬🇧",
         "Great Britain": "🇬🇧",
@@ -84,24 +84,24 @@ struct FlagManager {
         "Turkey": "🇹🇷",
         "South Africa": "🇿🇦"
     ]
-    
+
     /// Returns a flag emoji for the given nationality
     /// Falls back to a neutral flag if nationality is unknown or mapping is unavailable
     static func flagEmoji(for nationality: String?) -> String {
         guard let nationality = nationality else {
             return neutralFlag
         }
-        
+
         return flagMap[nationality] ?? neutralFlag
     }
-    
+
     /// Returns a flag emoji for the given country
     /// Falls back to a neutral flag if country is unknown or mapping is unavailable
     static func countryFlag(for country: String?) -> String {
         guard let country = country else {
             return neutralFlag
         }
-        
+
         return flagMap[country] ?? neutralFlag
     }
 }

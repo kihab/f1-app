@@ -6,7 +6,7 @@ import Foundation
 /// Provides localized strings for the application
 /// Currently returns hardcoded strings, but structured to support proper localization in the future
 struct Localizable {
-    
+
     /// Home screen and navigation related strings
     enum Home {
         static let title = "Formula 1 Seasons"
@@ -15,7 +15,7 @@ struct Localizable {
         static let championPrefix = "Champion: "
         static let nationalityPrefix = "Nationality: "
     }
-    
+
     /// Race related strings
     enum Races {
         static let noRacesAvailable = "No races available for that year."
@@ -25,7 +25,7 @@ struct Localizable {
         static let winnerPrefix = "Winner: "
         static let wikipediaLinkText = "Wikipedia Page"
     }
-    
+
     /// Loading state strings
     enum Loading {
         static let generic = "Loading data..."
@@ -33,14 +33,14 @@ struct Localizable {
         static let races = "Preparing race data...\nLoading races"
         static let racesWithYear = { (year: String) in "Preparing race data...\nLoading races from \(year)" }
     }
-    
+
     /// Error messages
     enum Errors {
         static let networkError = "Network error. Please check your connection."
         static let dataError = "Could not load data. Please try again."
         static let unexpectedError = "An unexpected error occurred."
     }
-    
+
     /// Helper method to get localized string - setup for future proper localization
     /// Currently just returns the English string, but structure is in place for localization
     static func string(for key: String) -> String {

@@ -9,9 +9,9 @@ import XCTest
 @testable import Formula1
 
 class FlagManagerTests: XCTestCase {
-    
+
     // MARK: - Nationality Flag Tests
-    
+
     func testFlagEmojiForKnownNationalities() {
         // Test various nationalities with known mappings
         let testCases: [(nationality: String, expectedFlag: String)] = [
@@ -29,37 +29,37 @@ class FlagManagerTests: XCTestCase {
             ("Mexican", "🇲🇽"),
             ("Japanese", "🇯🇵")
         ]
-        
+
         for testCase in testCases {
             // Act
             let flag = FlagManager.flagEmoji(for: testCase.nationality)
-            
+
             // Assert
             XCTAssertEqual(flag, testCase.expectedFlag, "Flag for \(testCase.nationality) should be \(testCase.expectedFlag)")
         }
     }
-    
+
     func testFlagEmojiForUnknownNationality() {
         // Arrange
         let unknownNationality = "Unknown"
-        
+
         // Act
         let flag = FlagManager.flagEmoji(for: unknownNationality)
-        
+
         // Assert
         XCTAssertEqual(flag, "🏳️", "Should return neutral flag for unknown nationality")
     }
-    
+
     func testFlagEmojiForNilNationality() {
         // Act
         let flag = FlagManager.flagEmoji(for: nil)
-        
+
         // Assert
         XCTAssertEqual(flag, "🏳️", "Should return neutral flag for nil nationality")
     }
-    
+
     // MARK: - Country Flag Tests
-    
+
     func testCountryFlagForKnownCountries() {
         // Test various countries with known mappings
         let testCases: [(country: String, expectedFlag: String)] = [
@@ -85,41 +85,41 @@ class FlagManagerTests: XCTestCase {
             ("Belgium", "🇧🇪"),
             ("Japan", "🇯🇵")
         ]
-        
+
         for testCase in testCases {
             // Act
             let flag = FlagManager.countryFlag(for: testCase.country)
-            
+
             // Assert
             XCTAssertEqual(flag, testCase.expectedFlag, "Flag for \(testCase.country) should be \(testCase.expectedFlag)")
         }
     }
-    
+
     func testCountryFlagForUnknownCountry() {
         // Arrange
         let unknownCountry = "Unknown Country"
-        
+
         // Act
         let flag = FlagManager.countryFlag(for: unknownCountry)
-        
+
         // Assert
         XCTAssertEqual(flag, "🏳️", "Should return neutral flag for unknown country")
     }
-    
+
     func testCountryFlagForNilCountry() {
         // Act
         let flag = FlagManager.countryFlag(for: nil)
-        
+
         // Assert
         XCTAssertEqual(flag, "🏳️", "Should return neutral flag for nil country")
     }
-    
+
     // MARK: - Edge Cases
-    
+
     func testCaseSensitivity() {
         // Arrange - Different case variations of "British"
         let variations = ["british", "BRITISH", "British", "BrItIsH"]
-        
+
         // Act & Assert
         for variation in variations {
             let flag = FlagManager.flagEmoji(for: variation)

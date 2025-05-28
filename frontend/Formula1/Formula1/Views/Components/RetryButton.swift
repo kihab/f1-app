@@ -6,10 +6,10 @@ import SwiftUI
 struct RetryButton: View {
     // The action to perform when the button is tapped
     var action: () -> Void
-    
+
     // Optional label text override
     var labelText: String = "Retry"
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
