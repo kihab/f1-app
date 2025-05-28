@@ -67,18 +67,12 @@ jobs:
           -resultBundlePath TestResults \
           test
 
-      - name: Zip .xcresult for easy download
-        run: |
-          BUNDLE=$(ls frontend/Formula1/TestResults/*.xcresult | head -1)
-          zip -r frontend/Formula1/f1app.xcresult.zip "$BUNDLE"
-
-      
       - name: Archive test results
         if: always()  # always run, even if previous steps fail
         uses: actions/upload-artifact@v4
         with:
           name: Formula1TestResults
-          path: frontend/Formula1/f1app.xcresult.zip
+          path: frontend/Formula1/TestResults
 
       - name: List contents of TestResults
         run: ls -l frontend/Formula1/TestResults
