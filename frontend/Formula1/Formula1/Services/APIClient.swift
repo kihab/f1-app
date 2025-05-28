@@ -6,14 +6,20 @@ import Network
 
 /// Provides methods to fetch data from the Formula 1 API.
 class APIClient: APIClientProtocol {
-    private let baseSeasonsURL = "http://localhost:3000/api/seasons"
-    private let networkMonitor = NetworkMonitor()
+    // Use constants instead of string literals
+    private let baseURL: String
+    private let seasonsEndpoint: String
+    // Dependencies injected for better testability
+    private let networkMonitor: NetworkMonitor
+    private let session: URLSessionProtocol
     
     /// Fetches a list of seasons from the API and maps them to domain models.
     /// - Returns: An array of `Season` domain models.
     /// - Throws: A `NetworkError` if any step of the process fails.
     /// Maps HTTP status codes to appropriate NetworkError types
-    private func mapHTTPError(_ statusCode: Int) -> NetworkError {
+    /// - Parameter statusCode: The HTTP status code to map to a NetworkError
+    /// - Returns: The appropriate NetworkError for the given status code
+    internal func mapHTTPError(_ statusCode: Int) -> NetworkError {
         switch statusCode {
         case 404:
             return .emptyData
@@ -28,13 +34,44 @@ class APIClient: APIClientProtocol {
         }
     }
     
+    /// Initializes the API client with dependencies.
+    /// - Parameters:
+    ///   - baseURL: The base URL for API requests
+    ///   - seasonsEndpoint: The endpoint for seasons data
+    ///   - networkMonitor: The network monitor to check connectivity
+    ///   - session: The URL session for network requests
+    init(
+        baseURL: String = Constants.Network.baseURL,
+        seasonsEndpoint: String = Constants.Network.seasonsEndpoint,
+        networkMonitor: NetworkMonitor = NetworkMonitor(),
+        session: URLSessionProtocol = URLSession.shared
+    ) {
+        self.baseURL = baseURL
+        self.seasonsEndpoint = seasonsEndpoint
+        self.networkMonitor = networkMonitor
+        self.session = session
+    }
+    
+    /// Creates the full URL for fetching seasons data
+    /// - Returns: The URL for the seasons endpoint or nil if invalid
+    func makeSeasonsURL() -> URL? {
+        return URL(string: baseURL + seasonsEndpoint)
+    }
+    
+    /// Creates the full URL for fetching races data for a specific year
+    /// - Parameter year: The year to fetch races for
+    /// - Returns: The URL for the races endpoint or nil if invalid
+    func makeRacesURL(year: Int) -> URL? {
+        return URL(string: baseURL + seasonsEndpoint + "/\(year)/races")
+    }
+    
     func fetchSeasons() async throws -> [Season] {
         // Check for network connectivity before making the request
         guard networkMonitor.isConnected else {
             throw NetworkError.offline
         }
         
-        guard let url = URL(string: baseSeasonsURL) else {
+        guard let url = makeSeasonsURL() else {
             throw NetworkError.invalidURL
         }
         
@@ -42,7 +79,8 @@ class APIClient: APIClientProtocol {
         let response: URLResponse
         
         do {
-            (data, response) = try await URLSession.shared.data(from: url)
+            // Use the injected session property instead of URLSession.shared
+            (data, response) = try await session.data(from: url)
         } catch {
             throw NetworkError.requestFailed(error)
         }
@@ -93,7 +131,7 @@ class APIClient: APIClientProtocol {
             throw NetworkError.offline
         }
         
-        guard let url = URL(string: "\(baseSeasonsURL)/\(year)/races") else {
+        guard let url = makeRacesURL(year: year) else {
             throw NetworkError.invalidURL
         }
         
@@ -101,7 +139,8 @@ class APIClient: APIClientProtocol {
         let response: URLResponse
         
         do {
-            (data, response) = try await URLSession.shared.data(from: url)
+            // Use the injected session property instead of URLSession.shared
+            (data, response) = try await session.data(from: url)
         } catch {
             throw NetworkError.requestFailed(error)
         }

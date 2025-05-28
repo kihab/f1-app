@@ -1,0 +1,46 @@
+{
+    "data": [
+        {
+            "round": 1,
+            "name": "Bahrain Grand Prix",
+            "url": "https://en.wikipedia.org/wiki/2023_Bahrain_Grand_Prix",
+            "date": "2023-03-05",
+            "country": "Bahrain",
+            "isChampion": true,
+            "winner": {
+                "id": "verstappen",
+                "name": "Max Verstappen",
+                "driverRef": "verstappen",
+                "nationality": "Dutch"
+            }
+        },
+        {
+            "round": 2,
+            "name": "Saudi Arabian Grand Prix",
+            "url": "https://en.wikipedia.org/wiki/2023_Saudi_Arabian_Grand_Prix",
+            "date": "2023-03-19",
+            "country": "Saudi Arabia",
+            "isChampion": true,
+            "winner": {
+                "id": "perez",
+                "name": "Sergio Pérez",
+                "driverRef": "perez",
+                "nationality": "Mexican"
+            }
+        },
+        {
+            "round": 3,
+            "name": "Australian Grand Prix",
+            "url": "https://en.wikipedia.org/wiki/2023_Australian_Grand_Prix",
+            "date": "2023-04-02",
+            "country": "Australia",
+            "isChampion": true,
+            "winner": {
+                "id": "verstappen",
+                "name": "Max Verstappen",
+                "driverRef": "verstappen",
+                "nationality": "Dutch"
+            }
+        }
+    ]
+}

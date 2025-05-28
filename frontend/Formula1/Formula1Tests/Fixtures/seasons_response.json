@@ -1,0 +1,31 @@
+{
+    "data": [
+        {
+            "year": 2023,
+            "champion": {
+                "id": "verstappen",
+                "name": "Max Verstappen",
+                "driverRef": "verstappen",
+                "nationality": "Dutch"
+            }
+        },
+        {
+            "year": 2022,
+            "champion": {
+                "id": "verstappen",
+                "name": "Max Verstappen",
+                "driverRef": "verstappen",
+                "nationality": "Dutch"
+            }
+        },
+        {
+            "year": 2021,
+            "champion": {
+                "id": "verstappen",
+                "name": "Max Verstappen",
+                "driverRef": "verstappen",
+                "nationality": "Dutch"
+            }
+        }
+    ]
+}
