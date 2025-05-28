@@ -7,8 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0712B9FE2DE61E9D007DB32B /* Formula1UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0712B9FB2DE61E9D007DB32B /* Formula1UITests.swift */; };
-		0712B9FF2DE61E9D007DB32B /* Formula1UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0712B9FC2DE61E9D007DB32B /* Formula1UITestsLaunchTests.swift */; };
+		0712BA282DE7965D007DB32B /* SeasonsListViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0712BA272DE7965D007DB32B /* SeasonsListViewUITests.swift */; };
+		0712BA2B2DE7986B007DB32B /* SplashScreenViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0712BA2A2DE7986B007DB32B /* SplashScreenViewUITests.swift */; };
+		0712BA2C2DE7986B007DB32B /* RacesListViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0712BA292DE7986B007DB32B /* RacesListViewUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,8 +30,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0712B9FB2DE61E9D007DB32B /* Formula1UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formula1UITests.swift; sourceTree = "<group>"; };
-		0712B9FC2DE61E9D007DB32B /* Formula1UITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formula1UITestsLaunchTests.swift; sourceTree = "<group>"; };
+		0712BA272DE7965D007DB32B /* SeasonsListViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeasonsListViewUITests.swift; sourceTree = "<group>"; };
+		0712BA292DE7986B007DB32B /* RacesListViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RacesListViewUITests.swift; sourceTree = "<group>"; };
+		0712BA2A2DE7986B007DB32B /* SplashScreenViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenViewUITests.swift; sourceTree = "<group>"; };
 		071F298D2DDBAEFC00F0FE77 /* Formula1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Formula1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		071F299D2DDBAEFE00F0FE77 /* Formula1Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Formula1Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		071F29A72DDBAEFE00F0FE77 /* Formula1UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Formula1UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,8 +79,9 @@
 		0712B9FD2DE61E9D007DB32B /* Formula1UITests */ = {
 			isa = PBXGroup;
 			children = (
-				0712B9FB2DE61E9D007DB32B /* Formula1UITests.swift */,
-				0712B9FC2DE61E9D007DB32B /* Formula1UITestsLaunchTests.swift */,
+				0712BA292DE7986B007DB32B /* RacesListViewUITests.swift */,
+				0712BA2A2DE7986B007DB32B /* SplashScreenViewUITests.swift */,
+				0712BA272DE7965D007DB32B /* SeasonsListViewUITests.swift */,
 			);
 			path = Formula1UITests;
 			sourceTree = "<group>";
@@ -259,8 +262,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0712B9FE2DE61E9D007DB32B /* Formula1UITests.swift in Sources */,
-				0712B9FF2DE61E9D007DB32B /* Formula1UITestsLaunchTests.swift in Sources */,
+				0712BA282DE7965D007DB32B /* SeasonsListViewUITests.swift in Sources */,
+				0712BA2B2DE7986B007DB32B /* SplashScreenViewUITests.swift in Sources */,
+				0712BA2C2DE7986B007DB32B /* RacesListViewUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
