@@ -67,13 +67,12 @@ jobs:
             -resultBundlePath TestResults.xcresult \
             test
 
-
       - name: Archive test results
         if: always()  # always run, even if previous steps fail
         uses: actions/upload-artifact@v4
         with:
           name: Formula1TestResults
-          path: TestResults
+          path: TestResults.xcresult/**
 
       - name: List contents of TestResults
         run: ls -l TestResults.xcresult
