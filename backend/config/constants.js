@@ -8,6 +8,10 @@ const ERGAST_BASE_URL = 'https://api.jolpi.ca/ergast/f1';
 const START_YEAR = 2005;
 const CURRENT_YEAR = new Date().getFullYear();
 
+// Cron job settings
+// const SEASON_SYNC_CRON = '0 4 * * 1'; // Every Monday at 4am UTC
+const SEASON_SYNC_CRON = '*/5 * * * *'; // Every 5 minutes (for testing)
+
 // HTTP Status codes
 const HTTP_STATUS = {
     OK: 200,
@@ -50,5 +54,8 @@ module.exports = {
     THROTTLE_MS,
     
     // Cache TTL
-    CACHE_TTL
+    CACHE_TTL,
+    
+    // Cron job settings
+    SEASON_SYNC_CRON
 };
