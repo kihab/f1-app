@@ -1,13 +1,17 @@
-# Docker & Docker Compose Setup
+# Docker & Docker Compose Setup (Updated)
 
-This document explains the Docker and Docker Compose setup for the F1 World Champions full-stack project. It covers key design decisions, file structure, how to run the backend and database in containers, and how we handle database migration and seeding.
+This document explains the **updated** Docker and Docker Compose setup for the F1 World Champions full-stack project, reflecting recent improvements:
+
+* Dedicated migration step
+* Automated DB and Redis seeding before backend starts
+* Improved startup orchestration
 
 ---
 
 ## **1. Overview**
 
 This project uses Docker to ensure a reliable, repeatable development environment for both the Node.js backend and PostgreSQL database.
-Docker Compose orchestrates multi-container startup, allowing both services to be launched and networked together with a single command.
+Docker Compose orchestrates multi-container startup, allowing all services to be launched and networked together with a single command.
 
 ---
 
@@ -38,7 +42,8 @@ Located at: **`backend/Dockerfile`**
 * Copies and installs dependencies.
 * Copies source code and Prisma files.
 * Generates the Prisma client (for the container's Linux environment).
-* Runs Prisma migrations **automatically** before starting the server.
+* Exposes port 3000 for API access.
+* Runs the server with `npm start` (now just starts the API; migrations run separately).
 
 ```dockerfile
 FROM node:20-alpine
@@ -57,9 +62,7 @@ EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
-> The `start` script in `package.json` runs:
-> `npx prisma migrate deploy && node index.js`
-> This **automatically applies DB schema migrations on startup**—reviewers never need to run manual migration commands.
+> **Note:** Migrations are now run by a separate Compose service, not inside the backend startup.
 
 ---
 
@@ -70,13 +73,22 @@ Located at: **`infrastructure/docker-compose.yml`**
 ### **Services:**
 
 * **db:**
-  Runs PostgreSQL 16 (alpine), using a named Docker volume for persistent data, and sets up the correct database, user, and password for the app.
-* **backend:**
-  Builds from `../backend`, injects environment variables (including the Postgres connection string), depends on the DB being healthy, and exposes port 3000 for API access.
+  Runs PostgreSQL 16 (alpine), with a persistent Docker volume, creating the database, user, and password.
+
 * **redis:**
-  Runs Redis 7 (alpine) as an in-memory cache for improving API response times. The backend automatically connects to this service for caching frequently accessed data.
+  Runs Redis 7 (alpine) as an in-memory cache for improving API response times. The backend automatically connects to this service for caching.
+
+* **migrate:**
+  Runs database migrations **before** any seeding or backend logic. Waits for DB to be healthy, applies all Prisma migrations, then exits.
+
+* **seed:**
+  Runs the seeding script to prefill the DB and Redis cache with F1 season data. Depends on DB, Redis, and completed migrations. Exits after completion.
+
+* **backend:**
+  Builds and starts the API only after all of the above are complete, exposing port 3000.
+
 * **pgadmin:**
-  Runs pgAdmin 4 (version 8.6), a web-based PostgreSQL administration tool that provides a graphical interface to manage the database. It's accessible via a web browser at http://localhost:8080 using the credentials admin@f1.com (email) and adminpw123 (password).
+  Web-based PostgreSQL admin tool, available at [http://localhost:8080](http://localhost:8080).
 
 ```yaml
 services:
@@ -94,30 +106,71 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    build: ../backend
+    command: ["npx", "prisma", "migrate", "deploy"]
+    environment:
+      DATABASE_URL: postgres://f1user:f1usersecretpassword@db:5432/f1db?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+
+  seed:
+    build: ../backend
+    command: ["node", "scripts/seedSeasons.js"]
+    environment:
+      DATABASE_URL: postgres://f1user:f1usersecretpassword@db:5432/f1db?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
   backend:
     build: ../backend
     environment:
       DATABASE_URL: postgres://f1user:f1usersecretpassword@db:5432/f1db?schema=public
-      REDIS_HOST: redis          # Redis service hostname (internal Docker network)
-      REDIS_PORT: 6379           # Default Redis port
-      # Add other backend ENV vars here (ERGAST_API_BASE, etc.)
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
+      seed:
+        condition: service_completed_successfully
     ports:
       - "3000:3000"
 
-  redis:  # Redis cache
-    image: redis:7-alpine
+  pgadmin:
+    image: dpage/pgadmin4:8.6
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@f1.com
+      PGADMIN_DEFAULT_PASSWORD: adminpw123
     ports:
-      - "6379:6379"              # Exposed for local debug/inspection
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - "8080:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
 
 volumes:
   db-data:
@@ -127,33 +180,47 @@ volumes:
 
 ### **Key Decisions Explained**
 
-* **Volumes (`db-data`, `redis-data`, `pgadmin-data`)**: Persist data across container restarts and rebuilds for database, Redis, and pgAdmin settings respectively.
-* **Healthcheck**: Ensures backend starts **only after** the database and Redis are ready to accept connections, eliminating race conditions.
-* **Environment Variables**: All credentials and connection info are controlled through Compose and `.env`.
-* **Automatic Migrations**: The backend runs migrations on startup, so no reviewer action is needed.
-* **Redis Cache**: Improves API performance by caching frequently accessed data with configurable TTLs.
-* **pgAdmin**: Provides a web-based UI for database management and inspection without requiring any local Postgres tools.
-* **No Frontend Service**: Only backend, DB, Redis, and pgAdmin are containerized (frontend is a native iOS app).
+* **Startup Orchestration:**
+
+  * Services start in order: DB → Migrate → Redis → Seed → Backend
+  * No race conditions: backend API only starts when DB, Redis, migrations, and seeding are complete
+
+* **Volumes:**
+
+  * Persist data for database, Redis, and pgAdmin
+
+* **Healthcheck:**
+
+  * Ensures service dependencies are actually healthy before dependent containers run
+
+* **Environment Variables:**
+
+  * Credentials and connection info are managed in Compose and `.env`
+
+* **No Frontend Service:**
+
+  * Frontend is an iOS app (not containerized)
 
 ---
 
 ## **5. Environment Variables**
 
-* **.env** file in `backend/` (used by Prisma and Node):
+* **.env** file in `backend/`:
 
   ```env
   DATABASE_URL="postgresql://f1user:f1usersecretpassword@db:5432/f1db?schema=public"
   REDIS_HOST="redis"
   REDIS_PORT="6379"
   ```
-* **Compose overrides** these in the backend container for guaranteed consistency.
+* Compose overrides these in the backend container for consistency.
 
 ---
 
-## **6. API Seeding & Throttling**
+## **6. Database Migration & Seeding**
 
-* **On first API request**, seasons/races are seeded from the Ergast proxy (rate-limited).
-* Seeding uses a **300ms delay between requests** and up to **3 retries** with exponential backoff on HTTP 429 responses, ensuring reliability even if rate-limits are hit.
+* **Migrations** are run as a dedicated service (`migrate`) in Compose, guaranteeing schema is applied before any other logic.
+* **Seeding** is handled by a separate service (`seed`), which runs only after migrations and cache are ready, ensuring all F1 data is present and cached on first run.
+* **Both `migrate` and `seed` are one-off jobs** that exit after completion.
 
 ---
 
@@ -165,13 +232,13 @@ volumes:
 docker compose up --build
 ```
 
-* This command will:
+This command will:
 
-  1. Pull/start the Postgres, Redis, and pgAdmin containers.
-  2. Build and start the backend.
-  3. Apply all DB migrations.
-  4. Seed data on first run (and cache results in Redis).
-  5. Expose API at `http://localhost:3000` and pgAdmin at `http://localhost:8080`
+1. Pull/start the Postgres, Redis, and pgAdmin containers.
+2. Build and run the migration job.
+3. Build and run the seeding job.
+4. Build and start the backend server (API).
+5. Expose API at `http://localhost:3000` and pgAdmin at `http://localhost:8080`
 
 **To stop and remove containers/volumes:**
 
@@ -183,43 +250,39 @@ docker compose down -v
 
 ## **8. Review Notes & Common Questions**
 
-* **No manual migration commands** are needed—handled by backend on startup.
-* **Database persists data** (volume) until you run `down -v`.
-* **API rate limiting** is respected—code uses retry logic and proxy's `Retry-After` header.
-* **No "localhost" DB host in backend**; Compose networks services using service names (`db` and `redis`).
-* **Seeding delay** and retries are easily tuned in code for future changes.
-* **Redis caching** is automatically configured—no manual setup required.
-* **pgAdmin access** is available at http://localhost:8080—login with admin@f1.com and adminpw123.
+* No manual migration or seeding commands needed—handled by Compose.
+* Database persists data (volume) until you run `down -v`.
+* Compose orchestrates service order and health.
+* API and Redis service names are used for network connectivity.
+* pgAdmin available at [http://localhost:8080](http://localhost:8080) ([admin@f1.com](mailto:admin@f1.com) / adminpw123).
 
 ---
 
 ## **9. Troubleshooting**
 
-* If you see 429 (Too Many Requests) logs, the API seed logic will handle it and continue.
-* To reset everything (including DB data), use `docker compose down -v` before restarting.
-* For any connection issues, double-check `.env` and Compose credentials.
+* If you see errors during migrations or seeding, check logs of the `migrate` or `seed` service.
+* To reset everything, use `docker compose down -v` before restarting.
+* For any connection issues, double-check `.env` and Compose service credentials.
 
 ---
 
 ## **10. Why This Approach?**
 
 * **Repeatable setup:** Any team member or reviewer can start and test the stack locally with a single command.
-* **No manual DB setup:** All DB schema and seed logic is self-contained and automated.
-* **Easy to extend:** Add more services or change configs easily with Compose.
-* **Production-like:** Mirrors production environments with clear, testable isolation.
+* **No manual DB setup:** All DB schema and seed logic is automated and tested.
+* **Production-like:** Mirrors production environments for robust, cloud-native workflows.
 
 ---
 
 ## **11. Further Improvements**
 
-* ~~Could add a migration admin tool (like `pgAdmin`) as another service if needed.~~ ✅ Done
-* Could add batch seeding or background jobs if API limits are tighter in future.
-* Could implement Redis persistence or cluster configuration for production environments.
-* Could add Redis monitoring/admin tools (like Redis Commander) as an additional service.
+* Could add background refresh jobs for race data.
+* Could add Redis admin tools for cache monitoring.
+* Could add more robust alerting and health checks for prod environments.
 
 ---
 
 ## **12. Contact / Support**
 
-For issues, please check logs in both `db` and `backend` containers.
+For issues, please check logs in the `db`, `migrate`, `seed`, and `backend` containers.
 All credentials are for local/dev only; do not use in production.
