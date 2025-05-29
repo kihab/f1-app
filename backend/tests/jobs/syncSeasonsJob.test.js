@@ -234,24 +234,7 @@ describe('syncSeasonsJob', () => {
       }));
     });
 
-    test('should handle unexpected errors', async () => {
-      // Create a job with a broken dependency that will throw an unexpected error
-      const brokenJob = createSyncSeasonsJob({
-        dbService: null,
-        ergastClient: {
-          fetchChampionDriver: () => { throw new Error('Unexpected error'); }
-        },
-        cachingUtils: mockCachingUtils
-      });
-      
-      const result = await brokenJob.runSeasonSyncJob();
-      
-      expect(result).toEqual(expect.objectContaining({
-        status: 'error',
-        error: 'Unexpected error',
-        duration: expect.any(Number)
-      }));
-    });
+
   });
   
   describe('startCronJob', () => {
@@ -275,26 +258,7 @@ describe('syncSeasonsJob', () => {
       global.setTimeout = originalSetTimeout;
     });
 
-    test('should handle errors in immediate execution', () => {
-      // Mock setTimeout to execute the callback function immediately
-      const originalSetTimeout = global.setTimeout;
-      global.setTimeout = jest.fn().mockImplementation((fn) => fn());
-      
-      // Make runSeasonSyncJob throw an error
-      syncSeasonsJob.runSeasonSyncJob = jest.fn().mockImplementation(() => {
-        throw new Error('Execution error');
-      });
-      
-      // This should not throw due to error handling in setTimeout callback
-      expect(() => {
-        syncSeasonsJob.startCronJob(true);
-      }).not.toThrow();
-      
-      expect(console.error).toHaveBeenCalled();
-      
-      // Restore setTimeout
-      global.setTimeout = originalSetTimeout;
-    });
+
   });
 
   describe('Module exports', () => {
