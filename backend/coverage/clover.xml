@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1748288282957" clover="3.2.0">
-  <project timestamp="1748288282957" name="All files">
+<coverage generated="1748512728155" clover="3.2.0">
+  <project timestamp="1748512728155" name="All files">
     <metrics statements="374" coveredstatements="354" conditionals="203" coveredconditionals="181" methods="65" coveredmethods="57" elements="642" coveredelements="592" complexity="0" loc="374" ncloc="374" packages="4" files="15" classes="15"/>
     <package name="controllers">
       <metrics statements="31" coveredstatements="31" conditionals="10" coveredconditionals="10" methods="2" coveredmethods="2"/>
@@ -46,11 +46,11 @@
       <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="races.js" path="/Users/kihab/Development/f1-app/backend/routes/races.js">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="52" count="1" type="stmt"/>
-        <line num="53" count="1" type="stmt"/>
-        <line num="54" count="1" type="stmt"/>
-        <line num="57" count="1" type="stmt"/>
-        <line num="59" count="1" type="stmt"/>
+        <line num="76" count="1" type="stmt"/>
+        <line num="77" count="1" type="stmt"/>
+        <line num="78" count="1" type="stmt"/>
+        <line num="81" count="1" type="stmt"/>
+        <line num="83" count="1" type="stmt"/>
       </file>
       <file name="seasons.js" path="/Users/kihab/Development/f1-app/backend/routes/seasons.js">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
