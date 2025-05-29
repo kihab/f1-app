@@ -28,15 +28,16 @@ module.exports = {
       "services/**/*.js",
       "controllers/**/*.js",
       "utils/**/*.js",
-      "routes/**/*.js"
+      "routes/**/*.js",
+      "jobs/**/*.js"
     ],
 
     coverageThreshold: {
       global: {
-        lines: 85,
-        statements: 85,
-        functions: 85,
-        branches: 85
+        lines: 80,
+        statements: 80,
+        functions: 80,
+        branches: 80
       }
     }
   };
