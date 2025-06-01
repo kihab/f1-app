@@ -278,9 +278,18 @@ View the pipeline status and logs in the [GitHub Actions](https://github.com/kih
 For more detailed documentation, please refer to:
 
 - [API Documentation](./backend/docs/api_design_decision.md)
+- [Caching Strategy](./backend/docs/caching_strategy.md)
+- [Seeeding Script](./backend/docs/seeeding_script.md)
+- [Sync Seasons Cron Job](./backend/docs/sync_seasons_cron_job.md)
+- [Dependencies](./backend/docs/dependencies.md)
+- [Folder Structure](./backend/docs/folder_structure.md)
+- [Backend Diagrams and screenshots](./backend/docs/diagrams)
 - [Database Schema](./backend/docs/diagrams/erd_database/erd_database_schema.md)
-- [Testing Strategy](./backend/docs/testing_strategy.md)
+- [Backend Testing Strategy](./backend/docs/testing_strategy.md)
+- [Frontend Diagrams and screenshots](./frontend/Formula1/Formula1/docs/diagrams)
+- [Frontend Testing Strategy](./frontend/Formula1/Formula1/docs/testing_strategy.md)
 - [CI/CD Pipeline](./infrastructure/docs/ci_cd_pipeline_plan.md)
+- [Docker](./infrastructure/docs/docker.md)
 
     ---
 
