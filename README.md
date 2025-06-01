@@ -135,8 +135,8 @@ graph TD
    - Launch pgAdmin (available at http://localhost:8080)
 
    **Note on First Run**: The initial setup might take a few minutes as it needs to:
-   - Download and build Docker images
-   - Initialize the database
+   - Build Docker images
+   - Initialize the database, run migrations, Redis cache, ...etc
    - Seed all F1 historical data
    
    Wait until you see this in the logs before proceeding:
@@ -149,7 +149,11 @@ graph TD
    backend-1  | Connected to Redis at redis:6379
    ```
    
-   Subsequent starts will be much faster as the database and cache persist between restarts.
+   Subsequent starts will be much faster as the database and cache persist between restarts and you only need to run 
+    ```bash
+   docker-compose up
+   ```
+   for any subsequent starts.
 
 2. **Access the Application**
    - API: `http://localhost:3000`
