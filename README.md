@@ -200,18 +200,10 @@ backend/
 ├── src/                      # Source code
 │   ├── config/               # Configuration files
 │   ├── controllers/          # Request handlers and route definitions
-│   ├── dto/                  # Data Transfer Objects
-│   ├── middleware/           # Express middleware
-│   ├── models/               # Database models and schemas
-│   ├── repositories/         # Data access layer
 │   ├── routes/               # API route definitions
 │   ├── services/             # Business logic
 │   ├── utils/                # Utility functions and helpers
-│   └── validators/           # Request validation
-├── tests/                    # Test files with >99% coverage
-│   ├── integration/          # Integration tests
-│   ├── unit/                 # Unit tests
-│   └── __mocks__/            # Mock data and utilities
+├── tests/                    # Test files with
 ├── prisma/                   # Database schema and migrations
 └── docs/                     # Comprehensive documentation
     ├── diagrams/             # System architecture diagrams
@@ -236,8 +228,6 @@ Formula1/
 │   ├── ViewModels/          # ViewModels for MVVM
 │   ├── Services/            # Network and data services
 │   ├── Utils/               # Extensions and helpers
-│   ├── Resources/           # Assets, localization, etc.
-│   └── App/                 # App entry point and main components
 ├── Formula1Tests/           # Unit tests
 ├── Formula1UITests/         # UI tests
 └── docs/                    # iOS-specific documentation
@@ -254,10 +244,6 @@ Formula1/
 ### Infrastructure (`/infrastructure`)
 ```
 infrastructure/
-├── docker/                  # Docker configuration files
-│   ├── nginx/               # Nginx configuration
-│   ├── postgres/            # PostgreSQL initialization scripts
-│   └── redis/               # Redis configuration
 ├── docs/                    # Infrastructure documentation
 │   ├── ci_cd_pipeline_plan.md
 │   ├── cicd_pipeline_initial_architecture_decision.md

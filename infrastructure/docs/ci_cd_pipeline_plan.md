@@ -28,27 +28,30 @@ This document details the CI/CD strategy and pipeline decisions for the **F1 Wor
   * iOS pipeline runs on macOS (macOS 15 with Xcode 16.2)
   * Both pipelines run in parallel on push/PR to main/master branches
 ----
-## CI/CD Pipeline Design: Parallel Jobs
+## CI/CD Pipeline Design: Separate Workflows
 
-Our pipeline is implemented as two parallel GitHub Actions jobs:
+Our pipeline is implemented as two separate GitHub Actions workflows that run independently:
 
-1. **Backend Job (`backend-ci`)**
+1. **Backend Workflow (`.github/workflows/backend-ci.yml`)**
    - Runs on Ubuntu-latest runner
    - Handles Node.js/Express API pipeline
    - Uses Node.js v20
-   - Runs in parallel with iOS job
+   - Triggers on changes to backend code or configuration
+   - Can run independently of the iOS workflow
 
-2. **iOS Job (`ios-ci`)**
+2. **iOS Workflow (`.github/workflows/ios-ci.yml`)**
    - Runs on macOS-15 runner
    - Handles iOS app pipeline
    - Uses Xcode 16.2
-   - Runs in parallel with backend job
+   - Triggers on changes to iOS code or configuration
+   - Can run independently of the backend workflow
 
 **Benefits:**
-- Parallel execution of backend and iOS pipelines
-- Better utilization of CI resources
+- Independent execution of backend and iOS pipelines
+- Better CI resource utilization by only running relevant workflows
 - Clear separation of concerns between platforms
-- Each job can be configured with platform-specific requirements
+- Faster feedback cycles when changes are isolated to one part of the codebase
+- Each workflow can be configured with its own triggers and conditions
 
 ---
 
@@ -123,28 +126,43 @@ Our pipeline is implemented as two parallel GitHub Actions jobs:
 ### Combined Pipeline Execution
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                        GitHub Actions Workflow                          │
-│  ┌───────────────────────┐        ┌───────────────────────────┐  │
-│  │     Backend Job       │        │        iOS Job            │  │
-│  │  (Ubuntu Runner)       │        │    (macOS 15 Runner)      │  │
-│  │                       │        │                           │  │
-│  │  • Checkout Code       │        │  • Checkout Code          │  │
-│  │  • Setup Node.js       │        │  • Setup Xcode 16.2       │  │
-│  │  • Install Dependencies│        │  • Install SwiftLint      │  │
-│  │  • Audit Dependencies  │        │  • Run SwiftLint          │  │
-│  │  • Run Linter         │        │  • Build & Test           │  │
-│  │  • Run Tests          │        │  • Enforce 70% Coverage   │  │
-│  │  • Enforce 80% Coverage│        │  • Archive Test Results   │  │
-│  │  • Build Docker Image │        │                           │  │
-│  └──────────┬────────────┘        └────────────┬──────────────┘  │
-│             │                                    │                 │
-│             └────────────────┬───────────────────┘                 │
-│                              ▼                                     │
-│                    Combined Status Report                          │
+│                     GitHub Actions Workflows                           │
+├───────────────────────────────────────────────────────────────────────┤
+│  ┌───────────────────────────┐    ┌───────────────────────────────┐  │
+│  │   Backend Workflow        │    │      iOS Workflow            │  │
+│  │  (Ubuntu Runner)          │    │    (macOS 15 Runner)         │  │
+│  │                           │    │                               │  │
+│  │  • Checkout Code          │    │  • Checkout Code              │  │
+│  │  • Setup Node.js          │    │  • Setup Xcode 16.2           │  │
+│  │  • Install Dependencies   │    │  • Install SwiftLint          │  │
+│  │  • Audit Dependencies     │    │  • Run SwiftLint              │  │
+│  │  • Run Linter            │    │  • Build & Test               │  │
+│  │  • Run Tests             │    │  • Enforce 70% Coverage       │  │
+│  │  • Enforce 80% Coverage  │    │  • Archive Test Results       │  │
+│  │  • Build Docker Image    │    │                               │  │
+│  └──────────┬───────────────┘    └───────────────┬─────────────────┘  │
+│             │                                      │                    │
+│             │                                      │                    │
+│             ▼                                      ▼                    │
+│  ┌──────────────────────┐              ┌──────────────────────┐  │
+│  │  Backend Status      │              │    iOS Status        │  │
+│  └──────────────────────┘              └──────────────────────┘  │
 └───────────────────────────────────────────────────────────────────┘
 ```
 
-The pipeline automatically runs on pushes to main/master branches and on pull requests targeting these branches. Both jobs run in parallel, ensuring efficient resource utilization while maintaining code quality standards. The backend pipeline enforces 80% coverage across lines, statements, functions, and branches, while the iOS pipeline enforces 70% line coverage.
+Each workflow automatically runs on pushes to main/master branches and on pull requests targeting these branches, but only when relevant files are changed. This ensures efficient resource utilization by only running the necessary workflows:
+
+- **Backend Workflow** runs when:
+  - Any file in the `backend/` directory changes
+  - Any workflow configuration file changes
+  - Manually triggered
+
+- **iOS Workflow** runs when:
+  - Any file in the `frontend/` directory changes
+  - Any workflow configuration file changes
+  - Manually triggered
+
+The backend pipeline enforces 80% coverage across lines, statements, functions, and branches, while the iOS pipeline enforces 70% line coverage.
 
 ---
 
