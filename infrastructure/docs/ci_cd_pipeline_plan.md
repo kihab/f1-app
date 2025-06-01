@@ -28,21 +28,27 @@ This document details the CI/CD strategy and pipeline decisions for the **F1 Wor
   * iOS pipeline runs on macOS (macOS 15 with Xcode 16.2)
   * Both pipelines run in parallel on push/PR to main/master branches
 ----
-## CI/CD Pipeline Design: Single Job vs. Multiple Jobs
+## CI/CD Pipeline Design: Parallel Jobs
 
-Our pipeline is currently implemented as a single GitHub Actions job with sequential steps. This approach was chosen for simplicity and speed, as all steps share the same environment and filesystem, minimizing setup time and resource usage.
+Our pipeline is implemented as two parallel GitHub Actions jobs:
 
-**Pros:**  
-- Simple and easy to follow for small/medium projects  
-- All steps share context and filesystem  
-- Lower CI resource consumption
+1. **Backend Job (`backend-ci`)**
+   - Runs on Ubuntu-latest runner
+   - Handles Node.js/Express API pipeline
+   - Uses Node.js v20
+   - Runs in parallel with iOS job
 
-**Cons:**  
-- No parallel execution; steps always run sequentially  
-- Less modular; cannot rerun or isolate specific stages  
-- Limited workflow visualization
+2. **iOS Job (`ios-ci`)**
+   - Runs on macOS-15 runner
+   - Handles iOS app pipeline
+   - Uses Xcode 16.2
+   - Runs in parallel with backend job
 
-As the project grows, I am aware that splitting the workflow into multiple jobs—with dependencies managed via `needs:`—can enable parallelism, better isolation, and improved visual tracking of the pipeline. The pipeline structure can be easily refactored if these advantages become more valuable for our team or project scale.
+**Benefits:**
+- Parallel execution of backend and iOS pipelines
+- Better utilization of CI resources
+- Clear separation of concerns between platforms
+- Each job can be configured with platform-specific requirements
 
 ---
 
@@ -50,20 +56,23 @@ As the project grows, I am aware that splitting the workflow into multiple jobs�
 
 ### Backend Pipeline
 1. **Trigger:** On push or PR to main branches
-2. **Install:** Install Node.js dependencies (npm ci)
-3. **Lint:** Run ESLint to check code style and static analysis
-4. **Test:** Run Jest tests (fail if any test fails)
-5. **Coverage:** Enforce a minimum coverage threshold (fail if coverage < 20%)
-6. **Build:** Build Docker image (do not push yet)
-7. **Optional (future):** Security scan, Docker image push, deploy to Render/Railway/Fly.io
+2. **Setup:** Set up Node.js v20 environment
+3. **Install:** Install dependencies using npm ci
+4. **Audit:** Run npm audit with high severity threshold
+5. **Lint:** Run ESLint for code style and static analysis
+6. **Test:** Run Jest tests (fail if any test fails)
+7. **Coverage:** Enforce 80% minimum coverage (lines, statements, functions, branches)
+8. **Build:** Build Docker image (do not push yet)
+9. **Optional (future):** Security scan, Docker image push, deploy to cloud
 
 ### iOS Pipeline
 1. **Trigger:** On push or PR to main branches
 2. **Setup:** Install Xcode 16.2 and configure environment
-3. **Build & Test:** Build the app and run unit tests on iOS Simulator
-4. **Coverage:** Enforce 70% minimum code coverage
-5. **Artifacts:** Upload test results and coverage reports
-6. **Future:** Add UI testing, code signing, and deployment to TestFlight
+3. **Lint:** Run SwiftLint for code style checking
+4. **Test:** Build and test app on iPhone 16 simulator (iOS 18.2)
+5. **Coverage:** Enforce 70% minimum line coverage
+6. **Artifacts:** Upload test results bundle (.xcresult)
+7. **Future:** Add UI testing, code signing, and deployment to TestFlight
 
 ---
 
@@ -121,9 +130,12 @@ As the project grows, I am aware that splitting the workflow into multiple jobs�
 │  │                       │        │                           │  │
 │  │  • Checkout Code       │        │  • Checkout Code          │  │
 │  │  • Setup Node.js       │        │  • Setup Xcode 16.2       │  │
-│  │  • Install Dependencies│        │  • Build & Test          │  │
-│  │  • Lint & Test         │        │  • Enforce 70% Coverage  │  │
-│  │  • Build Docker Image  │        │  • Upload Test Results   │  │
+│  │  • Install Dependencies│        │  • Install SwiftLint      │  │
+│  │  • Audit Dependencies  │        │  • Run SwiftLint          │  │
+│  │  • Run Linter         │        │  • Build & Test           │  │
+│  │  • Run Tests          │        │  • Enforce 70% Coverage   │  │
+│  │  • Enforce 80% Coverage│        │  • Archive Test Results   │  │
+│  │  • Build Docker Image │        │                           │  │
 │  └──────────┬────────────┘        └────────────┬──────────────┘  │
 │             │                                    │                 │
 │             └────────────────┬───────────────────┘                 │
@@ -132,7 +144,7 @@ As the project grows, I am aware that splitting the workflow into multiple jobs�
 └───────────────────────────────────────────────────────────────────┘
 ```
 
-The pipeline automatically runs on pushes to main/master branches and on pull requests targeting these branches. Each stage must pass before proceeding to the next one, ensuring code quality at every step.
+The pipeline automatically runs on pushes to main/master branches and on pull requests targeting these branches. Both jobs run in parallel, ensuring efficient resource utilization while maintaining code quality standards. The backend pipeline enforces 80% coverage across lines, statements, functions, and branches, while the iOS pipeline enforces 70% line coverage.
 
 ---
 
