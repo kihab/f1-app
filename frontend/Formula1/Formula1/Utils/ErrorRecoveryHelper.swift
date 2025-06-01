@@ -9,22 +9,22 @@ class ErrorRecoveryHelper {
     static func suggestion(for error: NetworkError) -> String? {
         switch error {
         case .offline:
-            return "Check your internet connection and try again."
+            return Localizable.Errors.checkConnection
         case .rateLimited:
-            return "Please wait a moment before retrying."
+            return Localizable.Errors.tryAgainLater
         case .serverMaintenance:
-            return "Try again later when the server is available."
+            return Localizable.Errors.serverUnavailable
         case .emptyData:
-            return "Try adjusting your search or filter criteria."
+            return Localizable.Errors.adjustSearch
         case .httpError(let statusCode):
             if statusCode >= 500 {
-                return "The server encountered an error. Please try again later."
+                return Localizable.Errors.serverError
             } else if statusCode >= 400 {
-                return "There was a problem with the request. Please try again."
+                return Localizable.Errors.requestProblem
             }
             return nil
         case .requestFailed:
-            return "The request failed. Please check your connection and try again."
+            return Localizable.Errors.requestFailedRecovery
         default:
             return nil // No specific suggestion for other errors
         }
@@ -34,13 +34,13 @@ class ErrorRecoveryHelper {
     static func buttonLabel(for error: NetworkError) -> String {
         switch error {
         case .offline:
-            return "Reconnect"
+            return Localizable.Errors.reconnect
         case .rateLimited:
-            return "Try Again Later"
+            return Localizable.Errors.tryAgain
         case .serverMaintenance:
-            return "Retry"
+            return Localizable.Errors.retry
         default:
-            return "Retry"
+            return Localizable.Errors.retry
         }
     }
 }

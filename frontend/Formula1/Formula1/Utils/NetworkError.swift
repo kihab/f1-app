@@ -19,25 +19,25 @@ enum NetworkError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "The URL provided was invalid."
+            return Localizable.Errors.invalidURL
         case .requestFailed(let error):
-            return "The network request failed: \(error.localizedDescription)"
+            return String(format: Localizable.Errors.requestFailed, error.localizedDescription)
         case .invalidResponse:
-            return "The server returned an invalid response."
+            return Localizable.Errors.invalidResponse
         case .httpError(let statusCode):
-            return "Server error: HTTP Status Code \(statusCode)."
+            return String(format: Localizable.Errors.httpError, statusCode)
         case .decodingError(let error):
-            return "Failed to decode data: \(error.localizedDescription)."
+            return String(format: Localizable.Errors.decodingError, error.localizedDescription)
         case .noData:
-            return "No data was received from the server."
+            return Localizable.Errors.noData
         case .offline:
-            return "No internet connection. Please check your connection and try again."
+            return Localizable.Errors.offline
         case .emptyData:
-            return "No results found."
+            return Localizable.Errors.emptyData
         case .serverMaintenance:
-            return "Server is currently under maintenance. Please try again later."
+            return Localizable.Errors.serverMaintenance
         case .rateLimited:
-            return "Too many requests. Please wait and try again."
+            return Localizable.Errors.rateLimited
         }
     }
 }

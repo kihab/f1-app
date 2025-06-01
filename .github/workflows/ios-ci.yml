@@ -1,47 +1,20 @@
-name: Full CI
+name: iOS CI
 
 on:
   push:
     branches:
       - main
       - master
+    paths:
+      - 'frontend/Formula1/**'
   pull_request:
     branches:
       - main
       - master
+    paths:
+      - 'frontend/Formula1/**'
 
 jobs:
-  backend-ci:
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: backend
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Audit dependencies
-        run: npm audit --audit-level=high
-
-      - name: Run linter
-        run: npx eslint .
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build Docker image
-        run: docker build -t f1-backend:ci .
-  # ─────────────── iOS CI Job ───────────────
   ios-ci:
     runs-on: macos-15
 
@@ -97,30 +70,3 @@ jobs:
             echo "Code coverage ($COVERAGE%) is below 70%."
             exit 1
           fi
-
-
-      
-      # TODO: iOS Project doesn't have SPM dependencies yet.
-      # - name: Cache SPM
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.swiftpm
-      #     key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-spm-
-
-
-      # TODO: Not very useful for now.      
-      # - name: Cache DerivedData
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: frontend/Formula1/DerivedData
-      #     key: ${{ runner.os }}-deriveddata-${{ github.sha }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-deriveddata-
-
-
-      
-
-
-
