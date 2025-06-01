@@ -21,6 +21,9 @@ jest.mock('../../config/constants', () => ({
   START_YEAR: 2005,
   CURRENT_YEAR: 2025,
   THROTTLE_MS: 100,
+  CACHE_KEYS: {
+    SEASONS: 'seasons'
+  },
   CACHE_TTL: {
     SEASONS: 300
   }
@@ -70,7 +73,10 @@ describe('seasonsService', () => {
       const customDeps = {
         dbService: { custom: true },
         ergastClient: { custom: true },
-        constants: { custom: true },
+        constants: { 
+          custom: true,
+          CACHE_KEYS: { SEASONS: 'seasons' }
+        },
         validationUtils: { custom: true },
         commonUtils: { custom: true }
       };

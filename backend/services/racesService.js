@@ -36,10 +36,10 @@ function createRacesService(deps = {}) {
   const { validateYear, validateDriverData, validateRaceData } = validationUtils;
   const { logOperationStart, formatTimingLog } = commonUtils;
   const { getFromCache, setInCache } = cachingUtils;
-  const { CACHE_TTL } = constants;
+  const { CACHE_KEYS, CACHE_TTL } = constants;
   
   // Cache key format for races by season
-  const getRacesCacheKey = (year) => `races:${year}`;
+  const getRacesCacheKey = (year) => `${CACHE_KEYS.RACES}:${year}`;
 
   /**
    * Get all races for a specific season with winners

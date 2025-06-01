@@ -33,13 +33,13 @@ function createSeasonsService(deps = {}) {
   
   // Destructure needed methods and constants from dependencies
   const { fetchChampionDriver } = ergastClient;
-  const { START_YEAR, CURRENT_YEAR, CACHE_TTL } = constants;
+  const { START_YEAR, CURRENT_YEAR, CACHE_KEYS, CACHE_TTL } = constants;
   const { validateYear, validateDriverData } = validationUtils;
   const { logOperationStart, formatTimingLog } = commonUtils;
   const { getFromCache, setInCache } = cachingUtils;
   
-  // Constants for caching
-  const SEASONS_CACHE_KEY = 'seasons';
+  // Get cache keys from constants
+  const SEASONS_CACHE_KEY = CACHE_KEYS.SEASONS;
 
   /**
    * Get all Formula 1 seasons with champions
