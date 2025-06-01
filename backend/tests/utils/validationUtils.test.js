@@ -17,18 +17,18 @@ describe('validationUtils', () => {
     });
     
     test('should throw error for years before the min year', () => {
-      expect(() => validateYear(1949)).toThrow(/Year 1949 is out of valid range/);
-      expect(() => validateYear(1900)).toThrow(/Year 1900 is out of valid range/);
+      expect(() => validateYear(1949)).toThrow(/Invalid year: 1949 is out of valid range/);
+      expect(() => validateYear(1900)).toThrow(/Invalid year: 1900 is out of valid range/);
     });
     
     test('should throw error for years after the max year', () => {
       // Get current year + 2 (which should be invalid)
       const tooFarInFuture = new Date().getFullYear() + 2;
-      expect(() => validateYear(tooFarInFuture)).toThrow(/Year .* is out of valid range/);
+      expect(() => validateYear(tooFarInFuture)).toThrow(/Invalid year: .* is out of valid range/);
     });
     
     test('should throw error for non-integer values', () => {
-      expect(() => validateYear(2020.5)).toThrow(/Year 2020.5 is out of valid range/);
+      expect(() => validateYear(2020.5)).toThrow(/Invalid year: 2020.5 is out of valid range/);
     });
     
     test('should throw error for non-numeric values', () => {
@@ -62,8 +62,8 @@ describe('validationUtils', () => {
         { driverRef: 'max_verstappen' }  // Missing name
       ];
       
-      expect(() => validateDriverData(incompleteDrivers[0])).toThrow(/Driver reference is required/);
-      expect(() => validateDriverData(incompleteDrivers[1])).toThrow(/Driver name is required/);
+      expect(() => validateDriverData(incompleteDrivers[0])).toThrow(/Invalid driver data: Reference is required/);
+      expect(() => validateDriverData(incompleteDrivers[1])).toThrow(/Invalid driver data: Name is required/);
     });
     
     test('should throw error for too long field values', () => {
@@ -81,8 +81,8 @@ describe('validationUtils', () => {
         name: longString101
       };
       
-      expect(() => validateDriverData(driverWithLongRef)).toThrow(/Driver reference exceeds 50 characters/);
-      expect(() => validateDriverData(driverWithLongName)).toThrow(/Driver name exceeds 100 characters/);
+      expect(() => validateDriverData(driverWithLongRef)).toThrow(/Invalid driver data: Reference exceeds 50 characters/);
+      expect(() => validateDriverData(driverWithLongName)).toThrow(/Invalid driver data: Name exceeds 100 characters/);
     });
   });
   
@@ -107,7 +107,7 @@ describe('validationUtils', () => {
         name: 'Austrian Grand Prix'
       };
       
-      expect(() => validateRaceData(raceWithoutRound)).toThrow(/Race round must be a positive integer/);
+      expect(() => validateRaceData(raceWithoutRound)).toThrow(/Invalid race data: Round must be a positive integer/);
     });
     
     test('should throw error for invalid round', () => {
@@ -116,7 +116,7 @@ describe('validationUtils', () => {
         name: 'Austrian Grand Prix'
       };
       
-      expect(() => validateRaceData(raceWithInvalidRound)).toThrow(/Race round must be a positive integer/);
+      expect(() => validateRaceData(raceWithInvalidRound)).toThrow(/Invalid race data: Round must be a positive integer/);
     });
     
     test('should throw error for missing name', () => {
@@ -124,7 +124,7 @@ describe('validationUtils', () => {
         round: 1
       };
       
-      expect(() => validateRaceData(raceWithoutName)).toThrow(/Race name is required/);
+      expect(() => validateRaceData(raceWithoutName)).toThrow(/Invalid race data: Name is required/);
     });
     
     test('should throw error for too long name', () => {
@@ -134,7 +134,7 @@ describe('validationUtils', () => {
         name: longName101
       };
       
-      expect(() => validateRaceData(raceWithLongName)).toThrow(/Race name exceeds 100 characters/);
+      expect(() => validateRaceData(raceWithLongName)).toThrow(/Invalid race data: Name exceeds 100 characters/);
     });
   });
 });
