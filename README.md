@@ -124,19 +124,37 @@ graph TD
    cd infrastructure
    docker-compose up -d --build
    ```
-   This single command will:
+   
+   This single command will set up everything you need:
    - Build the backend Docker image
    - Start PostgreSQL database with initial schema
    - Set up Redis cache
    - Run database migrations
-   - Seed initial data
+   - Seed initial data (F1 seasons, and drivers)
    - Start the backend server
    - Launch pgAdmin (available at http://localhost:8080)
 
+   **Note on First Run**: The initial setup might take a few minutes as it needs to:
+   - Download and build Docker images
+   - Initialize the database
+   - Seed all F1 historical data
+   
+   Wait until you see this in the logs before proceeding:
+   ```
+   backend-1  | > backend@1.0.0 start
+   backend-1  | > node index.js
+   backend-1  | 
+   backend-1  | Scheduling F1 data refresh cron job: */5 * * * *
+   backend-1  | Backend API listening at http://localhost:3000
+   backend-1  | Connected to Redis at redis:6379
+   ```
+   
+   Subsequent starts will be much faster as the database and cache persist between restarts.
+
 2. **Access the Application**
-   - API will be available at `http://localhost:3000`
-   - Swagger UI at `http://localhost:3000/api-docs`
-   - pgAdmin at `http://localhost:8080` (email: `admin@f1.com`, password: `adminpw123`)
+   - API: `http://localhost:3000`
+   - Swagger UI: `http://localhost:3000/api-docs`
+   - pgAdmin: `http://localhost:8080` (email: `admin@f1.com`, password: `adminpw123`)
 
 5. **Access API Documentation**
    - Swagger UI: `http://localhost:3000/api-docs`
