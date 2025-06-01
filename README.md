@@ -85,6 +85,8 @@ graph TD
 
 *For a more detailed architecture diagram, see [High Level Architecture Flowchart](./backend/docs/diagrams/high_level_system_architecture_flowchart/high_level_system_architecture_flowchart.md)*
 
+**Note: Diagrams looks better in light mode vs dark mode.
+
 ## 🛠️ Tech Stack
 
 ### Backend
