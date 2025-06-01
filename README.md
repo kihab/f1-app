@@ -1,53 +1,287 @@
-# f1-app
-Full stack F1 World Champions
+# 🏎️ Formula 1 World Champions App
 
-## what does the app do? first high level 
+A full-stack application that showcases Formula 1 World Champions and race results. This project demonstrates modern full-stack development skills including API design, database modeling, automated testing, CI/CD, and native iOS development.
 
-## Then a very detailed description of the app and what it does and what it offers per component. 
+## 🚀 Features
 
-## What do we offer per platform, very detailed description of each platform
-    - for exmapl our backend offers a swagger documnetation for out API, mention that 
-    - for exmaple our iOS app offers a native app for iPhone no ipad support but we offer support for all iphoen screens,....etc 
+### Backend
+- **RESTful API** built with Node.js and Express
+- **PostgreSQL** database with Prisma ORM for type-safe database access
+- **Redis** caching layer for improved performance
+- **Docker** containerization for consistent development and deployment
+- **Automated Testing** with comprehensive test coverage
+- **Swagger/OpenAPI** documentation for all API endpoints
+- **Scheduled Jobs** for refreshing champion data
 
-## Tech Stack
-- iOS App: Swift
-- Backend: Node.js, Express, Prisma, PostgreSQL
-- CI/CD: GitHub Actions
-- Containerization: Docker, Docker Compose
-- Caching: Redis
+### iOS App (SwiftUI)
+- Native iOS application with support for all iPhone screen sizes
+- Clean, intuitive user interface following Apple's Human Interface Guidelines
+- Responsive design
+- Comprehensive error handling and loading states
 
+## 🏗️ System Architecture
 
-## dependencies section:
-    - should explain the dependencies of the BE app high level maybe even just the name and then refere to the dependencies.md file for more details, it has extensive details about the BE dependencies
-    - the iOS doesn't have any third party dependencies , it was intentional to keep it simple and clean and we didn't need any third party dependencies specifically to achieve the goal of the app.
+```mermaid
+graph TD
+    %% Client Layer
+    subgraph "Client Layer"
+        FE["iOS App<br/>(SwiftUI)"]
+        WEB["Web Browser<br/>(Potential Future)"]
+    end
+
+    %% Backend Layer
+    subgraph "Backend Layer"
+        API["API Gateway<br/>(Express)"]
+        
+        subgraph "Application Layer"
+            CTL["Controllers"]
+            SRV["Services"]
+            JOB["Scheduled Jobs"]
+        end
+        
+        subgraph "Data Access"
+            REPO["Repositories"]
+            CACHE["Cache Layer"]
+        end
+    end
+
+    %% Data Layer
+    subgraph "Data Layer"
+        DB["PostgreSQL<br/>(Primary Data)"]
+        ERGAST["Ergast API<br/>(External F1 Data)"]
+    end
+
+    %% Infrastructure
+    subgraph "Infrastructure"
+        DOCKER["Docker Containers"]
+        CI_CD["CI/CD Pipeline"]
+        MON["Monitoring & Logging"]
+    end
+
+    %% Connections
+    FE -->|REST/JSON| API
+    WEB -->|HTTP| API
     
+    API --> CTL
+    CTL <--> SRV
+    SRV <--> REPO
+    REPO <--> DB
+    REPO <-->|Cache Operations| CACHE
+    SRV <-->|Fetch Data| ERGAST
+    
+    JOB -->|Update Data| SRV
+    
+    %% Styling
+    classDef client fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    classDef backend fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    classDef data fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef infra fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px
+    
+    class FE,WEB client
+    class API,CTL,SRV,JOB,REPO,CACHE backend
+    class DB,ERGAST data
+    class DOCKER,CI_CD,INFRA infra
+```
 
-## Folder Structure section:
-    - should explain in detailed the folder structure of the whole repo in details what does ech folder contain and does each file contain and what does each exactly do 
-    - the pipeline docs is inside hte infrastructure folder - notice that - 
-    - make sure to explain that all the MD files that ends with "initial_architecture_decision" are the initial decisions we made, initials resrach, tradoffs, and there files are only there to document the initial decisions and my line of thoughts when I started the project and that they are mostly not matching the final decisions and the current final implementation is docuemnt in the other MD files per topic separated.
-    - explain that a file like this one "high_level_system_architecture_flowchart.md" has a mermaid diagram that shows the high level architecture of the app and that it is a static image that is generated from the mermaid code in the file.and its best to view it in github.com as it supports mermaid and it will render the diagram correctly. there is also a screenshot of that diagram incase you want to view it directly wihtout using github.com or another viewer.
+*For a more detailed architecture diagram, see [High Level Architecture Flowchart](./backend/docs/diagrams/high_level_system_architecture_flowchart/high_level_system_architecture_flowchart.md)*
 
-## The how to section :
-- how to run the app locally, docker compose up and speciics on how to run ios app 
+## 🛠️ Tech Stack
 
-- how to run the docker compose make sure docker desktop is running
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: PostgreSQL with Prisma ORM
+- **Caching**: Redis
+- **Containerization**: Docker & Docker Compose
+- **API Documentation**: Swagger/OpenAPI
+- **Testing**: Jest, Supertest
+- **CI/CD**: GitHub Actions
 
-- how to open the swagger documentation for the backend, which URL
+### iOS App
+- **Language**: Swift 5
+- **UI Framework**: SwiftUI
+- **Minimum iOS Version**: iOS 15.0+
+- **Dependencies**: None (intentionally kept minimal)
 
-- how to open the pgAdmin for the backend, which URL
+## 🚀 Getting Started
 
-- how to run the ios app:
+### Prerequisites
 
-- how to run the tests, both backend and ios app tests and how/where to see the test results and code coverage - Ask me if you didn't know how from the reading the Code base - and also mention that the io piplie generate artiifact tests results bundle and upload it to github actions and that you can download unpack and open it in Xcode and view the test results and code coverage.
+- **For Backend**:
+  - Docker Desktop (latest version)
+  - Node.js 18+ (If only want to run BE separately without docker)
+  - npm or yarn (If only want to run BE separately without docker)
 
-- how to run the ci/cd pipeline both backend and ios app pipeline, whic URL, add Github actions URL
+- **For iOS**:
+  - Xcode 14.0+
+  - macOS 12.0+
+  - iOS 15.0+ device or simulator
 
+### Running the Backend
 
-## High level architecture section:
-    - of the app 
-    - tradd off, high level becayse we trad off document inother files in details , refer to it.
-    - API Contract high level and refer to our API md file under backend folder 
+1. **Start All Services with Docker Compose**
+   ```bash
+   cd infrastructure
+   docker-compose up -d --build
+   ```
+   This single command will:
+   - Build the backend Docker image
+   - Start PostgreSQL database with initial schema
+   - Set up Redis cache
+   - Run database migrations
+   - Seed initial data
+   - Start the backend server
+   - Launch pgAdmin (available at http://localhost:8080)
 
+2. **Access the Application**
+   - API will be available at `http://localhost:3000`
+   - Swagger UI at `http://localhost:3000/api-docs`
+   - pgAdmin at `http://localhost:8080` (email: `admin@f1.com`, password: `adminpw123`)
 
+5. **Access API Documentation**
+   - Swagger UI: `http://localhost:3000/api-docs`
+   - pgAdmin: `http://localhost:5050` (email: `admin@admin.com`, password: `admin`)
 
+### Running the iOS App
+
+1. Open the Xcode workspace:
+   ```bash
+   cd frontend/Formula1
+   open Formula1.xcodeproj
+   ```
+
+2. Select a simulator or connect an iOS device
+
+3. Press `Cmd + R` to build and run the app
+
+## 🧪 Testing
+
+### Backend Tests
+```bash
+cd backend
+npm run test --coverage
+```
+
+### iOS Tests
+1. Open the Xcode project
+2. Press `Cmd + U` to run all tests locally and see result and coverage report.
+
+Also Test coverage reports are generated in the CI/CD pipeline and can be downloaded unpacked and opened in Xcode and viewed in the GitHub Actions artifacts.
+
+## 📁 Project Structure
+
+### Backend (`/backend`)
+```
+backend/
+├── src/                      # Source code
+│   ├── config/               # Configuration files
+│   ├── controllers/          # Request handlers and route definitions
+│   ├── dto/                  # Data Transfer Objects
+│   ├── middleware/           # Express middleware
+│   ├── models/               # Database models and schemas
+│   ├── repositories/         # Data access layer
+│   ├── routes/               # API route definitions
+│   ├── services/             # Business logic
+│   ├── utils/                # Utility functions and helpers
+│   └── validators/           # Request validation
+├── tests/                    # Test files with >99% coverage
+│   ├── integration/          # Integration tests
+│   ├── unit/                 # Unit tests
+│   └── __mocks__/            # Mock data and utilities
+├── prisma/                   # Database schema and migrations
+└── docs/                     # Comprehensive documentation
+    ├── diagrams/             # System architecture diagrams
+    ├── api_design_decision.md
+    ├── backend_initial_architecture_decision.md
+    ├── caching_strategy.md
+    ├── database_schema.md
+    ├── dependencies.md
+    ├── folder_structure.md
+    ├── linting_setup_and_decisions.md
+    ├── seeding_script.md
+    ├── sync_seasons_cron_job.md
+    └── testing_strategy.md
+```
+
+### iOS App (`/frontend/Formula1`)
+```
+Formula1/
+├── Formula1/                # Main app code
+│   ├── Models/              # Data models
+│   ├── Views/               # SwiftUI views
+│   ├── ViewModels/          # ViewModels for MVVM
+│   ├── Services/            # Network and data services
+│   ├── Utils/               # Extensions and helpers
+│   ├── Resources/           # Assets, localization, etc.
+│   └── App/                 # App entry point and main components
+├── Formula1Tests/           # Unit tests
+├── Formula1UITests/         # UI tests
+└── docs/                    # iOS-specific documentation
+    ├── diagrams/            # UI/UX flow diagrams
+    ├── error_handling.md
+    ├── folder_structure.md
+    ├── frontend_initial_architecture_decision.md
+    ├── ios_app_structure.md
+    ├── mvvm.md
+    ├── testing_strategy.md
+    └── ui_design_guide.md
+```
+
+### Infrastructure (`/infrastructure`)
+```
+infrastructure/
+├── docker/                  # Docker configuration files
+│   ├── nginx/               # Nginx configuration
+│   ├── postgres/            # PostgreSQL initialization scripts
+│   └── redis/               # Redis configuration
+├── docs/                    # Infrastructure documentation
+│   ├── ci_cd_pipeline_plan.md
+│   ├── cicd_pipeline_initial_architecture_decision.md
+│   ├── containerization_initial_architecture_decision.md
+│   ├── docker.md
+│   ├── git_flow_strategy.md
+│   └── screenshots/         # Infrastructure-related screenshots
+└── docker-compose.yml        # Main Docker Compose configuration
+```
+
+### Documentation Structure
+- **Backend Documentation**: Located in `/backend/docs`, contains comprehensive documentation about the backend architecture, API design, database schema, and implementation decisions.
+
+- **iOS App Documentation**: Located in `/frontend/Formula1/Formula1/docs`, covers iOS app architecture, UI/UX decisions, and implementation details.
+
+- **Infrastructure Documentation**: Located in `/infrastructure/docs`, focuses solely on infrastructure-related topics including Docker setup, CI/CD pipeline configuration, and deployment strategies.
+
+**Note on Initial Architecture Decision Files**:
+- Files named `*_initial_architecture_decision.md` document the initial research, trade-offs, and decision-making process at the start of the project.
+- These files represent the initial thinking and may not reflect the final implementation.
+- For current implementation details, refer to the other documentation files in each respective directory.
+
+## 🔄 CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration and deployment. The pipeline includes:
+
+1. **Backend Pipeline**:
+   - Linting and formatting checks
+   - Unit and integration tests
+   - Test coverage reporting
+   - Docker image building and pushing
+
+2. **iOS Pipeline**:
+   - Build and test on multiple iOS versions
+   - Generate test coverage reports
+   - Create test artifacts
+
+View the pipeline status and logs in the [GitHub Actions](https://github.com/kihab/f1-app/actions) tab.
+
+## 📚 Documentation
+
+For more detailed documentation, please refer to:
+
+- [API Documentation](./backend/docs/api_design_decision.md)
+- [Database Schema](./backend/docs/diagrams/erd_database/erd_database_schema.md)
+- [Testing Strategy](./backend/docs/testing_strategy.md)
+- [CI/CD Pipeline](./infrastructure/docs/ci_cd_pipeline_plan.md)
+
+    ---
+
+Built by [Kihab](https://github.com/kihab)

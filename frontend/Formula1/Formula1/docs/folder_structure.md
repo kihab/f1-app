@@ -10,12 +10,13 @@ The Formula 1 App follows MVVM architecture with clear separation of concerns. T
 Formula1/
 ├── Assets.xcassets/         # App icons and color assets
 ├── Formula1App.swift        # App entry point and DI setup
-├── Models/                  # Data models
+├── Models/                  # Data models and DTOs
 ├── Preview Content/         # SwiftUI preview assets
+├── Protocols/               # Protocol definitions
 ├── Services/                # API and network services
-├── Utils/                   # Utility helpers
+├── Utils/                   # Utility helpers and extensions
 ├── ViewModels/              # View logic and state management
-├── Views/                   # UI components
+├── Views/                   # UI components and screens
 └── docs/                    # Documentation
 ```
 
@@ -23,29 +24,40 @@ Formula1/
 
 ### Models/
 
-Contains data structures that represent domain entities:
+Contains data structures that represent domain entities and their DTOs:
 
-- `Driver.swift`: Driver model with ID, name, and nationality
-- `Race.swift`: Race model with round, name, date, country, and winner info
-- `Season.swift`: Season model with year and champion driver
+- `Driver.swift`: Driver model with ID, name, and reference
+- `DriverDTO.swift`: Data Transfer Object for Driver model
+- `Race.swift`: Race model with round, name, date, and circuit info
+- `RaceDTO.swift`: Data Transfer Object for Race model
+- `Season.swift`: Season model with year and champion info
+- `SeasonDTO.swift`: Data Transfer Object for Season model
+- `APIResponse.swift`: Generic response wrapper for API responses
+
+### Protocols/
+
+Protocol definitions for dependency injection and abstraction:
+
+- `APIClientProtocol.swift`: Defines the interface for API clients
+- `URLSessionProtocol.swift`: Protocol for URLSession to enable testing
 
 ### Services/
 
 Network and data services:
 
-- `APIClient.swift`: Interface for API requests
-- `NetworkError.swift`: Custom error types for network operations
+- `APIClient.swift`: Implementation of APIClientProtocol for making API requests
+- `APIClientProtocol.swift`: Protocol definition for API client
 
 ### Utils/
 
 Reusable utility functions and helpers:
 
+- `Constants.swift`: Central repository for app-wide constants (UI, network, etc.)
+- `ErrorRecoveryHelper.swift`: Provides user-friendly recovery suggestions for different error types
 - `FlagManager.swift`: Converts country/nationality strings to flag emojis
 - `FontManager.swift`: Centralizes font styling across the app
-- `Constants.swift`: Central repository for app-wide constants (UI, network, etc.)
-- `Localizable.swift`: Structured string management for future localization support
+- `Localizable.swift`: Structured string management for localization
 - `NetworkError.swift`: Custom error types for network operations
-- `ErrorRecoveryHelper.swift`: Provides user-friendly recovery suggestions for different error types
 - `NetworkMonitor.swift`: Monitors device network connectivity status
 
 ### ViewModels/
@@ -59,25 +71,22 @@ Manages business logic and state for views:
 
 UI components structured by screen:
 
+- `LoadingView.swift`: Reusable loading component
 - `RaceRowView.swift`: Individual race row in list
 - `RacesListView.swift`: Screen showing races for a selected season
 - `SeasonRowView.swift`: Individual season row in list
 - `SeasonsListView.swift`: Main screen showing all seasons
-- `LoadingView.swift`: Reusable loading component with shimmer animation
-- `SplashScreenView.swift`: App launch screen with F1 logo and shimmer effect
+- `SplashScreenView.swift`: App launch screen
 
 #### Components/
 
 Reusable UI components:
-
-- `RetryButton.swift`: Reusable button for retry actions
 - `ErrorToast.swift`: Toast-style error notification component
+- `RetryButton.swift`: Reusable button for retry actions
 
 ### docs/
 
 Project documentation:
 
-- `ios_app_structure.md`: Technical architecture overview
-- `ui_design_guide.md`: UI standards and visual components
 - `folder_structure.md`: This document (folder structure and file responsibilities)
-- `error_handling.md`: Error handling strategy and implementation details
+- Additional documentation files as needed
