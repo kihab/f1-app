@@ -10,7 +10,7 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 // Cron job settings
 // const SEASON_SYNC_CRON = '0 4 * * 1'; // Every Monday at 4am UTC
-const SEASON_SYNC_CRON = '*/5 * * * *'; // Every 5 minutes (for testing)
+const SEASON_SYNC_CRON = '*/10 * * * *'; // Every 10 minutes (for testing)
 
 // HTTP Status codes
 const HTTP_STATUS = {
