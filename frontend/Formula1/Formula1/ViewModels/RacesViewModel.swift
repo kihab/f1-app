@@ -13,7 +13,7 @@ class RacesViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var lastError: NetworkError? // Store the actual error for context
-    @Published var navigationTitle: String = "Races"
+    @Published var navigationTitle: String = Localizable.Home.racesTitle
 
     // Used to monitor network connectivity
     private var networkMonitor: NetworkMonitor
@@ -40,7 +40,7 @@ class RacesViewModel: ObservableObject {
             .sink { [weak self] isConnected in
                 if isConnected, self?.lastError == .offline {
                     // When network comes back and last error was offline, show reconnected message
-                    self?.errorMessage = "Network connection restored. You can try again."
+                    self?.errorMessage = Localizable.Errors.networkRestored
                 }
             }
             .store(in: &cancellables)

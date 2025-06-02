@@ -28,6 +28,13 @@ const MAX_RETRY_ATTEMPTS = 3;
 // Sleep/throttle durations
 const THROTTLE_MS = 300; // Standard throttle for API calls
 
+// Cache keys
+const CACHE_KEYS = {
+    SEASONS: 'seasons',
+    RACES: 'races',
+    // Add other cache keys as needed
+};
+
 // Cache TTL values (in seconds)
 const CACHE_TTL = {
     SEASONS: 300, // 5 minutes for seasons data
@@ -53,7 +60,8 @@ module.exports = {
     // Throttling
     THROTTLE_MS,
     
-    // Cache TTL
+    // Cache settings
+    CACHE_KEYS,
     CACHE_TTL,
     
     // Cron job settings

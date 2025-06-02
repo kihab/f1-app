@@ -19,6 +19,8 @@ A full-stack application that showcases Formula 1 World Champions and race resul
 - Responsive design
 - Comprehensive error handling and loading states
 
+> 🤖 **Fun Fact:** The entire iOS app's visual design was crafted using AI - from the app icon to the screens, lists, and even the Formula 1 loading logo! Generated with OpenAI's GPT-4.1 model, this showcases the power of AI in modern app development! 🚀
+
 ## 🏗️ System Architecture
 
 ```mermaid
@@ -124,7 +126,7 @@ graph TD
 1. **Start All Services with Docker Compose**
    ```bash
    cd infrastructure
-   docker-compose up -d --build
+   docker-compose up --build
    ```
    
    This single command will set up everything you need:
@@ -301,6 +303,7 @@ For more detailed documentation, please refer to:
 - [CI/CD Pipeline](./infrastructure/docs/ci_cd_pipeline_plan.md)
 - [Docker](./infrastructure/docs/docker.md)
 
-    ---
+---
+> 🤖 **Fun Fact:** The entire iOS app's visual design was crafted using AI - from the app icon to the screens, lists, and even the Formula 1 loading logo! Generated with OpenAI's GPT-4.1 model, this showcases the power of AI in modern app development! 🚀
 
 Built by [Kihab](https://github.com/kihab)

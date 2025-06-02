@@ -13,6 +13,7 @@ const { SEASON_SYNC_CRON, CURRENT_YEAR } = require('../config/constants');
 const dbServiceDefault = require('../services/dbService');
 const ergastClientDefault = require('../utils/ergastClient');
 const cachingUtilsDefault = require('../utils/cachingUtils');
+const constantsDefault = require('../config/constants');
 
 /**
  * Factory function to create seasons sync job with injectable dependencies
@@ -27,9 +28,10 @@ function createSyncSeasonsJob(deps = {}) {
   const dbService = deps.dbService || dbServiceDefault;
   const ergastClient = deps.ergastClient || ergastClientDefault;
   const cachingUtils = deps.cachingUtils || cachingUtilsDefault;
+  const constants = deps.constants || constantsDefault;
   
-  // Cache key for seasons data (matching the one used in seasonsService)
-  const SEASONS_CACHE_KEY = 'seasons';
+  // Get cache keys from constants
+  const SEASONS_CACHE_KEY = constants.CACHE_KEYS.SEASONS;
 
   /**
    * Directly updates the current season data by fetching from API

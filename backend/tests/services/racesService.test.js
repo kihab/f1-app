@@ -30,6 +30,10 @@ jest.mock('../../utils/cachingUtils', () => ({
 
 // Mock constants
 jest.mock('../../config/constants', () => ({
+  CACHE_KEYS: {
+    RACES: 'races',
+    SEASONS: 'seasons'
+  },
   CACHE_TTL: {
     RACES: 120
   }

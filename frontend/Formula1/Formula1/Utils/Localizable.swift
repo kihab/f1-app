@@ -14,6 +14,7 @@ struct Localizable {
         static let seasonPrefix = "Season: "
         static let championPrefix = "Champion: "
         static let nationalityPrefix = "Nationality: "
+        static let racesTitle = "Races"
     }
 
     /// Race related strings
@@ -39,6 +40,8 @@ struct Localizable {
         static let networkError = "Network error. Please check your connection."
         static let dataError = "Could not load data. Please try again."
         static let unexpectedError = "An unexpected error occurred."
+        static let networkRestored = "Network connection restored. You can try again."
+        static let loadingData = "Loading data..."
 
         // Network error messages
         static let invalidURL = "The URL provided was invalid."

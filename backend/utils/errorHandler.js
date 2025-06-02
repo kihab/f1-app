@@ -4,6 +4,7 @@
 // ------------------------------------------------------------
 
 const { sendBadRequestError, sendServerError, sendServiceUnavailableError } = require('./responseUtils');
+const ERROR_MESSAGES = require('../config/errorMessages');
 
 /**
  * Handles API errors with consistent classification and response formatting
@@ -16,9 +17,9 @@ function handleApiError(err, res, context) {
   console.error(`Error in ${context}:`, err.message);
   
   // Classify and respond appropriately based on error type/message
-  if (err.message && (err.message.includes('Invalid year') || 
-                      err.message.includes('Invalid driver data') ||
-                      err.message.includes('Invalid race data'))) {
+  if (err.message && (err.message.includes(ERROR_MESSAGES.VALIDATION.INVALID_YEAR) || 
+                      err.message.includes(ERROR_MESSAGES.VALIDATION.INVALID_DRIVER) ||
+                      err.message.includes(ERROR_MESSAGES.VALIDATION.INVALID_RACE))) {
     // Validation errors - Bad Request (400)
     return sendBadRequestError(res, err.message);
   } 
@@ -27,12 +28,13 @@ function handleApiError(err, res, context) {
       err.message.includes('timeout') ||
       err.response?.status === 429) {
     // Network timeout or rate limiting - Service Unavailable (503)
-    return sendServiceUnavailableError(res, 'External API service unavailable or rate limited');
+    return sendServiceUnavailableError(res, ERROR_MESSAGES.NETWORK.TIMEOUT);
   } 
   
   if (err.response && err.response.status) {
     // External API returned an error status - Service Unavailable (503)
-    return sendServiceUnavailableError(res, `External service error: ${err.message}`);
+    return sendServiceUnavailableError(res, 
+      `${ERROR_MESSAGES.NETWORK.EXTERNAL_API_ERROR}: ${err.message}`);
   } 
   
   if (err.message && (
@@ -41,11 +43,12 @@ function handleApiError(err, res, context) {
     err.message.includes('network failure') || 
     err.message.includes('External API'))) {
     // External API errors - Service Unavailable (503)
-    return sendServiceUnavailableError(res, `External service error: ${err.message}`);
+    return sendServiceUnavailableError(res, 
+      `${ERROR_MESSAGES.NETWORK.EXTERNAL_API_ERROR}: ${err.message}`);
   }
   
   // Default to 500 for unknown server errors
-  return sendServerError(res, `Failed to ${context}`);
+  return sendServerError(res, ERROR_MESSAGES.GENERIC.OPERATION_FAILED(context));
 }
 
 module.exports = {
