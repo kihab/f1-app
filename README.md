@@ -113,8 +113,10 @@ graph TD
 
 - **For Backend**:
   - Docker Desktop (latest version)
-  - Node.js 18+ (If only want to run BE separately without docker)
-  - npm or yarn (If only want to run BE separately without docker)
+  
+  - If only want to run BE separately without docker
+    - Node.js 18+
+    - npm or yarn
 
 - **For iOS**:
   - Xcode 14.0+
@@ -122,6 +124,7 @@ graph TD
   - iOS 15.0+ device or simulator
 
 ### Running the Backend
+** Make sure Docker Daemon/Desktop is running before starting the backend.**
 
 1. **Start All Services with Docker Compose**
    ```bash
@@ -159,12 +162,14 @@ graph TD
    ```
    for any subsequent starts.
 
-2. **Access the Application**
+2. **Access the Application and APIs**
    - API: `http://localhost:3000`
-   - Swagger UI: `http://localhost:3000/api-docs`
-   - pgAdmin: `http://localhost:8080` (email: `admin@f1.com`, password: `adminpw123`)
+   - Health check : `http://localhost:3000/health`
+   - Seasons API: `http://localhost:3000/api/seasons`
+   - Races API: `http://localhost:3000/api/seasons/2025/races`
+   - Drivers API: `http://localhost:3000/api/seasons/2025/drivers`
 
-5. **Access API Documentation**
+5. **Access API Documentation and Admin Tools**
    - Swagger UI: `http://localhost:3000/api-docs`
    - pgAdmin: `http://localhost:5050` (email: `admin@admin.com`, password: `admin`)
 
