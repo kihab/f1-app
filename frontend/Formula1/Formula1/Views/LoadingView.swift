@@ -13,7 +13,7 @@ struct LoadingView: View {
     // Animation state for shimmer effect
     @State private var shimmerOffset: CGFloat = -0.25
 
-    init(message: String = "Loading data...", logoScale: CGFloat = 1.0) {
+    init(message: String = Localizable.Errors.loadingData, logoScale: CGFloat = 1.0) {
         self.message = message
         self.logoScale = logoScale
     }
