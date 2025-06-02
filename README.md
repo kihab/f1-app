@@ -19,8 +19,6 @@ A full-stack application that showcases Formula 1 World Champions and race resul
 - Responsive design
 - Comprehensive error handling and loading states
 
-> 🤖 **Fun Fact:** The entire iOS app's visual design was crafted using AI - from the app icon to the screens, lists, and even the Formula 1 loading logo! Generated with OpenAI's GPT-4.1 model, this showcases the power of AI in modern app development! 🚀
-
 ## 🏗️ System Architecture
 
 ```mermaid
@@ -87,7 +85,7 @@ graph TD
 
 *For a more detailed architecture diagram, see [High Level Architecture Flowchart](./backend/docs/diagrams/high_level_system_architecture_flowchart/high_level_system_architecture_flowchart.md)*
 
-**Note: Diagrams looks better in light mode vs dark mode.
+*Note: Diagrams looks better in light mode vs dark mode.*
 
 ## 🛠️ Tech Stack
 
@@ -334,8 +332,8 @@ For more detailed documentation, please refer to:
 - [Frontend Testing Strategy](./frontend/Formula1/Formula1/docs/testing_strategy.md)
 - [CI/CD Pipeline](./infrastructure/docs/ci_cd_pipeline_plan.md)
 - [Docker](./infrastructure/docs/docker.md)
+- [Git Flow Strategy](./infrastructure/docs/git_flow_strategy.md)
 
 ---
-> 🤖 **Fun Fact:** The entire iOS app's visual design was crafted using AI - from the app icon to the screens, lists, and even the Formula 1 loading logo! Generated with OpenAI's GPT-4.1 model, this showcases the power of AI in modern app development! 🚀
 
 Built by [Kihab](https://github.com/kihab)
