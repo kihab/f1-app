@@ -3,9 +3,9 @@ services:
   db:  # PostgreSQL database
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: f1db
-      POSTGRES_USER: f1user
-      POSTGRES_PASSWORD: f1usersecretpassword
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
@@ -17,7 +17,7 @@ services:
   redis:  # Redis cache
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
       - redis-data:/data
     healthcheck:
@@ -30,7 +30,7 @@ services:
     build: ../backend
     command: ["npx", "prisma", "migrate", "deploy"]
     environment:
-      DATABASE_URL: postgres://f1user:f1usersecretpassword@db:5432/f1db?schema=public
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
     depends_on:
       db:
         condition: service_healthy
@@ -39,9 +39,9 @@ services:
     build: ../backend
     command: ["node", "scripts/seedSeasons.js"]   
     environment:
-      DATABASE_URL: postgres://f1user:f1usersecretpassword@db:5432/f1db?schema=public
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
       REDIS_HOST: redis
-      REDIS_PORT: 6379
+      REDIS_PORT: ${REDIS_PORT}
     depends_on:
       db:
         condition: service_healthy
@@ -53,9 +53,9 @@ services:
   backend:  # Node.js backend
     build: ../backend
     environment:
-      DATABASE_URL: postgres://f1user:f1usersecretpassword@db:5432/f1db?schema=public
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
       REDIS_HOST: redis
-      REDIS_PORT: 6379
+      REDIS_PORT: ${REDIS_PORT}
     depends_on:
       db:
         condition: service_healthy
@@ -66,15 +66,15 @@ services:
       seed:
         condition: service_completed_successfully
     ports:
-      - "3000:3000"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
 
   pgadmin:  # PostgreSQL web admin GUI
     image: dpage/pgadmin4:8.6
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@f1.com      # Email for pgAdmin login
-      PGADMIN_DEFAULT_PASSWORD: adminpw123     # Password for pgAdmin login
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}      # Email for pgAdmin login
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}     # Password for pgAdmin login
     ports:
-      - "8080:80"
+      - "${PGADMIN_PORT}:80"
     depends_on:
       - db
     volumes:
