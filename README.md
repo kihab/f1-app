@@ -124,7 +124,34 @@ graph TD
   - iOS 15.0+ device or simulator
 
 ### Running the Backend
-** Make sure Docker Daemon/Desktop is running before starting the backend.**
+## ⚠️ Important Notes
+
+### Docker Requirements
+
+Before starting the backend, ensure Docker Desktop is running on your system. If Docker is not running, you'll encounter an error similar to:
+
+```
+unable to get image 'dpage/pgadmin4:8.6': Cannot connect to the Docker daemon at unix://../.docker/run/docker.sock. Is the docker daemon running?
+```
+
+**To resolve this:**
+1. Open Docker Desktop
+2. Wait for the Docker daemon to fully start (watch for the Docker icon in your menu bar to show it's ready)
+3. Try running the backend again
+
+### Rate Limiting Notice
+
+The application uses the Ergast API which has rate limits in place. You might encounter HTTP 429 (Too Many Requests) errors if you:
+
+- Restart the backend multiple times in quick succession
+- Make too many requests in a short time period
+
+**Don't worry!** The application handles this gracefully by:
+- Automatically throttling requests
+- Implementing proper error handling
+- Providing clear feedback in the logs
+
+If you hit rate limits, simply wait a few moments - the system will automatically retry failed requests with appropriate backoff intervals. You can monitor the progress in the application logs.
 
 1. **Start All Services with Docker Compose**
    ```bash
